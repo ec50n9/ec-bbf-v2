@@ -12,8 +12,33 @@ import {
   LuBellRing,
 } from "react-icons/lu";
 import { cn } from "./lib/utils";
+import { DatabaseProvider } from "@/contexts/DatabaseContext";
+import { useDatabase } from "@/hooks/useDatabaseHook";
 
 export default function App() {
+  return (
+    <DatabaseProvider>
+      <Layout />
+    </DatabaseProvider>
+  );
+}
+
+function Layout() {
+  const { db } = useDatabase();
+  const { db: db2 } = useDatabase();
+  console.log("get db:", db);
+  console.log("get db2:", db2);
+  console.log("is equal:", db === db2);
+
+  const handleInsertTodo = async () => {
+    if (!db) return;
+    const result = await db.execute(
+      "INSERT into todos (id, title, status) VALUES ($1, $2, $3)",
+      [1, "hello, todo", "done"],
+    );
+    console.log("insert result:", result);
+  };
+
   return (
     <div className="h-screen grid grid-cols-[auto_1fr_auto] gap-8 bg-[#faf7f5] text-slate-700 p-4">
       <SideBar className="rounded-xl" />
@@ -24,6 +49,9 @@ export default function App() {
           <br />
           今天好好学习了没？
         </h1>
+        <div>
+          <Button onClick={handleInsertTodo}>添加任务</Button>
+        </div>
       </div>
 
       <UserInfoPanel className="w-72 rounded-3xl" />
