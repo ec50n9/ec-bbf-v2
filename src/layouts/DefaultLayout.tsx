@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   LuSquirrel,
   LuSettings,
   LuLassoSelect,
@@ -8,9 +14,11 @@ import {
   LuAlarmClock,
   LuAward,
   LuHome,
+  LuTimer,
 } from "react-icons/lu";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import type { IconType } from "react-icons/lib";
 
 export default function DefaultLayout(props: { children: React.ReactNode }) {
   return (
@@ -27,22 +35,11 @@ function SideBar(props: { className?: string }) {
     center: [
       { name: "点名", icon: LuLassoSelect, path: "/roll-call" },
       { name: "积分", icon: LuClipboardList, path: "/score" },
-      { name: "计时器", icon: LuAlarmClock, path: "/timer" },
+      { name: "计时器", icon: LuTimer, path: "/timer" },
       { name: "倒计时", icon: LuAlarmClock, path: "/countdown" },
       { name: "排行榜", icon: LuAward, path: "/ranking-list" },
     ],
     bottom: [{ name: "设置", icon: LuSettings, path: "/settings" }],
-  };
-
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleReplaceNavigation = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    path: string,
-  ) => {
-    event.preventDefault();
-    navigate(path, { replace: true });
   };
 
   return (
@@ -55,58 +52,19 @@ function SideBar(props: { className?: string }) {
       <div className="flex flex-col items-center gap-4">
         <LuSquirrel className="text-3xl" />
         {routes.top.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            title={item.name}
-            onClick={(e) => handleReplaceNavigation(e, item.path)}
-          >
-            <Button
-              variant={location.pathname === item.path ? "default" : "outline"}
-              size="icon"
-              className="rounded-full"
-            >
-              <item.icon className="size-4" />
-            </Button>
-          </Link>
+          <NavItem key={item.name} {...item} />
         ))}
       </div>
 
       <div className="flex flex-col gap-2">
         {routes.center.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            title={item.name}
-            onClick={(e) => handleReplaceNavigation(e, item.path)}
-          >
-            <Button
-              variant={location.pathname === item.path ? "default" : "outline"}
-              size="icon"
-              className="rounded-full"
-            >
-              <item.icon className="size-4" />
-            </Button>
-          </Link>
+          <NavItem key={item.name} {...item} />
         ))}
       </div>
 
       <div className="flex flex-col gap-2">
         {routes.bottom.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            title={item.name}
-            onClick={(e) => handleReplaceNavigation(e, item.path)}
-          >
-            <Button
-              variant={location.pathname === item.path ? "default" : "outline"}
-              size="icon"
-              className="rounded-full"
-            >
-              <item.icon className="size-4" />
-            </Button>
-          </Link>
+          <NavItem key={item.name} {...item} />
         ))}
         <Avatar className="size-8">
           <AvatarImage src="https://github.com/shadcn.png" />
@@ -114,5 +72,36 @@ function SideBar(props: { className?: string }) {
         </Avatar>
       </div>
     </div>
+  );
+}
+
+function NavItem(props: { name: string; icon: IconType; path: string }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleReplaceNavigation = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    path: string,
+  ) => {
+    event.preventDefault();
+    navigate(path, { replace: true });
+  };
+
+  return (
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger asChild>
+        <Button
+          variant={location.pathname === props.path ? "default" : "outline"}
+          size="icon"
+          className="rounded-full"
+          onClick={(e) => handleReplaceNavigation(e, props.path)}
+        >
+          <props.icon className="size-4" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={5}>
+        {props.name}
+      </TooltipContent>
+    </Tooltip>
   );
 }

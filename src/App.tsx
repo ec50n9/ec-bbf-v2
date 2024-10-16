@@ -1,5 +1,6 @@
 import "./App.css";
 import { DatabaseProvider } from "@/contexts/DatabaseContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import HomeView from "@/views/Home";
@@ -14,20 +15,22 @@ import SettingsView from "@/views/Settings";
 export default function App() {
   return (
     <DatabaseProvider>
-      <Router>
-        <DefaultLayout>
-          <Routes>
-            <Route path="/" element={<HomeView />} />
-            <Route path="/test" element={<TestView />} />
-            <Route path="/roll-call" element={<RollCallView />} />
-            <Route path="/score" element={<ScoreView />} />
-            <Route path="/timer" element={<TimerView />} />
-            <Route path="/countdown" element={<CountdownView />} />
-            <Route path="/ranking-list" element={<RankingListView />} />
-            <Route path="/settings" element={<SettingsView />} />
-          </Routes>
-        </DefaultLayout>
-      </Router>
+      <TooltipProvider>
+        <Router>
+          <DefaultLayout>
+            <Routes>
+              <Route path="/" element={<HomeView />} />
+              <Route path="/test" element={<TestView />} />
+              <Route path="/roll-call" element={<RollCallView />} />
+              <Route path="/score" element={<ScoreView />} />
+              <Route path="/timer" element={<TimerView />} />
+              <Route path="/countdown" element={<CountdownView />} />
+              <Route path="/ranking-list" element={<RankingListView />} />
+              <Route path="/settings" element={<SettingsView />} />
+            </Routes>
+          </DefaultLayout>
+        </Router>
+      </TooltipProvider>
     </DatabaseProvider>
   );
 }
