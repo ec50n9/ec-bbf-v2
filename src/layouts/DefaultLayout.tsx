@@ -15,18 +15,9 @@ import { cn } from "@/lib/utils";
 
 export default function DefaultLayout(props: { children: React.ReactNode }) {
   return (
-    <div className="h-screen grid grid-cols-[auto_1fr_auto] gap-8 bg-[#faf7f5] text-slate-700 p-4">
-      <SideBar className="rounded-xl" />
-
-      <div className="of-auto">
-        <h1 className="mt-5 text-4xl font-medium leading-snug">
-          下午好，
-          <br />
-          今天好好学习了没？
-        </h1>
-        <div>{props.children}</div>
-      </div>
-
+    <div className="h-screen grid grid-cols-[auto_1fr_auto] gap-8 bg-[#faf7f5] text-slate-700 overflow-hidden">
+      <SideBar className="rounded-2xl" />
+      <div className="overflow-auto">{props.children}</div>
       <UserInfoPanel className="w-72 rounded-3xl" />
     </div>
   );
@@ -49,14 +40,14 @@ function SideBar(props: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex flex-col justify-between items-center gap-8 bg-[#f1e8e1] p-4",
+        "ml-4 my-4 flex flex-col justify-between items-center gap-8 bg-[#f1e8e1] p-4",
         props.className,
       )}
     >
       <div className="flex flex-col items-center gap-4">
         <LuSquirrel className="text-3xl" />
         {routes.top.map((item) => (
-          <Link key={item.name} to={item.path}>
+          <Link key={item.name} to={item.path} title={item.name}>
             <Button
               variant={location.pathname === item.path ? "default" : "outline"}
               size="icon"
@@ -70,7 +61,7 @@ function SideBar(props: { className?: string }) {
 
       <div className="flex flex-col gap-2">
         {routes.center.map((item) => (
-          <Link key={item.name} to={item.path}>
+          <Link key={item.name} to={item.path} title={item.name}>
             <Button
               variant={location.pathname === item.path ? "default" : "outline"}
               size="icon"
@@ -84,7 +75,7 @@ function SideBar(props: { className?: string }) {
 
       <div className="flex flex-col gap-2">
         {routes.bottom.map((item) => (
-          <Link key={item.name} to={item.path}>
+          <Link key={item.name} to={item.path} title={item.name}>
             <Button
               variant={location.pathname === item.path ? "default" : "outline"}
               size="icon"
@@ -107,7 +98,7 @@ function UserInfoPanel(props: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex flex-col bg-[#f1e8e1] p-4 overflow-auto",
+        "mr-4 my-4 flex flex-col bg-[#f1e8e1] p-4 overflow-auto",
         props.className,
       )}
     >
