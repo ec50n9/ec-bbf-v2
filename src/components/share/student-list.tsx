@@ -21,17 +21,6 @@ export default function StudentList() {
     });
   });
 
-  if (!db) return <ErrorPage desc="数据库连接失败，请检查数据库配置" />;
-
-  const handleCreateRecord = async () => {
-    const res = await insertClass(db, {
-      name: "数据库测试",
-      grade: "一",
-      class: "大一",
-    });
-    console.log("创建班级:", res);
-  };
-
   const displayModes = [
     {
       value: "student",
@@ -43,6 +32,18 @@ export default function StudentList() {
     },
   ];
   const [displayMode, setDisplayMode] = useState(displayModes[0].value);
+
+  if (!db) return <ErrorPage desc="数据库连接失败，请检查数据库配置" />;
+
+  const handleCreateRecord = async () => {
+    const res = await insertClass(db, {
+      name: "数据库测试",
+      grade: "一",
+      class: "大一",
+    });
+    console.log("创建班级:", res);
+  };
+
 
   return (
     <div className="mt-2">

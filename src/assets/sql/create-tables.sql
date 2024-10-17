@@ -1,3 +1,14 @@
+/* 配置表 */
+CREATE TABLE IF NOT EXISTS "config" (
+ "id" INTEGER NOT NULL UNIQUE,
+ -- 配置名称
+ "name" VARCHAR,
+ -- 配置值
+ "value" VARCHAR,
+
+ PRIMARY KEY("id")
+);
+
 /* 学生表 */
 CREATE TABLE IF NOT EXISTS "student" (
 	"id" INTEGER NOT NULL UNIQUE,

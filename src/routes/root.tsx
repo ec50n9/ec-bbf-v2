@@ -3,7 +3,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
@@ -16,20 +15,26 @@ import {
   LuHome,
   LuTimer,
 } from "react-icons/lu";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons/lib";
 
-export default function DefaultLayout(props: { children: React.ReactNode }) {
+export default function Root() {
   return (
     <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-[#faf7f5] text-slate-900 overflow-hidden">
       <SideBar className="rounded-2xl" />
-      <div className="overflow-auto">{props.children}</div>
+      <div className="overflow-auto">
+        <Outlet />
+      </div>
     </div>
   );
 }
 
+/** 侧边栏 */
 function SideBar(props: { className?: string }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const routes = {
     top: [{ name: "首页", icon: LuHome, path: "/" }],
     center: [
@@ -42,6 +47,10 @@ function SideBar(props: { className?: string }) {
     bottom: [{ name: "设置", icon: LuSettings, path: "/settings" }],
   };
 
+  const handleOnNavigation = (path: string) => {
+    navigate(path, { replace: true });
+  };
+
   return (
     <div
       className={cn(
@@ -52,19 +61,34 @@ function SideBar(props: { className?: string }) {
       <div className="flex flex-col items-center gap-4">
         <LuSquirrel className="text-3xl" />
         {routes.top.map((item) => (
-          <NavItem key={item.name} {...item} />
+          <NavItem
+            key={item.name}
+            {...item}
+            selected={location.pathname === item.path}
+            onNavigate={handleOnNavigation}
+          />
         ))}
       </div>
 
       <div className="flex flex-col gap-2">
         {routes.center.map((item) => (
-          <NavItem key={item.name} {...item} />
+          <NavItem
+            key={item.name}
+            {...item}
+            selected={location.pathname === item.path}
+            onNavigate={handleOnNavigation}
+          />
         ))}
       </div>
 
       <div className="flex flex-col gap-2">
         {routes.bottom.map((item) => (
-          <NavItem key={item.name} {...item} />
+          <NavItem
+            key={item.name}
+            {...item}
+            selected={location.pathname === item.path}
+            onNavigate={handleOnNavigation}
+          />
         ))}
         <Avatar className="size-8">
           <AvatarImage src="https://github.com/shadcn.png" />
@@ -75,26 +99,23 @@ function SideBar(props: { className?: string }) {
   );
 }
 
-function NavItem(props: { name: string; icon: IconType; path: string }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleReplaceNavigation = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    path: string,
-  ) => {
-    event.preventDefault();
-    navigate(path, { replace: true });
-  };
-
+/** 导航项 */
+function NavItem(props: {
+  name: string;
+  icon: IconType;
+  path: string;
+  currentPath?: string;
+  selected: boolean;
+  onNavigate?: (path: string) => void;
+}) {
   return (
     <Tooltip delayDuration={100}>
       <TooltipTrigger asChild>
         <Button
-          variant={location.pathname === props.path ? "default" : "outline"}
+          variant={props.selected ? "default" : "outline"}
           size="icon"
           className="rounded-full"
-          onClick={(e) => handleReplaceNavigation(e, props.path)}
+          onClick={() => props.onNavigate?.(props.path)}
         >
           <props.icon className="size-4" />
         </Button>
