@@ -22,7 +22,7 @@ import type { IconType } from "react-icons/lib";
 
 export default function DefaultLayout(props: { children: React.ReactNode }) {
   return (
-    <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-[#faf7f5] text-slate-700 overflow-hidden">
+    <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-[#faf7f5] text-slate-900 overflow-hidden">
       <SideBar className="rounded-2xl" />
       <div className="overflow-auto">{props.children}</div>
     </div>
