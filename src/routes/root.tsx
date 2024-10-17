@@ -1,3 +1,4 @@
+import { useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -20,6 +21,17 @@ import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons/lib";
 
 export default function Root() {
+  const navigate = useNavigate();
+
+  const gotoLogin = useCallback(() => {
+    navigate("/login", { replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
+    // TODO: 检查登录状态
+    gotoLogin();
+  }, [gotoLogin]);
+
   return (
     <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-[#faf7f5] text-slate-900 overflow-hidden">
       <SideBar className="rounded-2xl" />
