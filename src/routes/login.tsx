@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Form,
   FormControl,
@@ -42,21 +42,12 @@ export default function LoginView() {
         ]}
         current={0}
       />
-      <div className="mt-9 mx-auto w-96">
+      <div className="my-9 mx-auto w-96">
         <ClassForm />
       </div>
     </div>
   );
 }
-
-const classFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, "班级名称不能为空")
-    .max(10, "班级名称不能超过 10 个字符"),
-  grade: z.string().min(1, "请选择所在年级"),
-  class: z.string().max(10, "长度不能大于 10").optional(),
-});
 
 /** 年级分组 */
 const gradeGroups = [
@@ -89,6 +80,15 @@ const gradeGroups = [
   },
 ];
 
+const classFormSchema = z.object({
+  name: z
+    .string()
+    .min(1, "班级名称不能为空")
+    .max(10, "班级名称不能超过 10 个字符"),
+  grade: z.string().min(1, "请选择所在年级"),
+  class: z.string().max(10, "长度不能大于 10").optional(),
+});
+
 function ClassForm() {
   const form = useForm<z.infer<typeof classFormSchema>>({
     resolver: zodResolver(classFormSchema),
@@ -105,7 +105,7 @@ function ClassForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-8">
         <FormField
           control={form.control}
           name="name"
@@ -164,8 +164,27 @@ function ClassForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">下一步</Button>
+
+        <ActionButton className="self-end rounded-full">下一步</ActionButton>
       </form>
     </Form>
+  );
+}
+
+function ActionButton(props: {
+  className?: string;
+  children: React.ReactNode;
+  type?: "submit";
+}) {
+  return (
+    <button
+      className={cn(
+        "shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] rounded-md text-white font-light transition duration-200 ease-linear",
+        props.className,
+      )}
+      type={props.type}
+    >
+      {props.children}
+    </button>
   );
 }
