@@ -1,5 +1,4 @@
 import type { BaseDataType, Constructor, OperationConfig } from "./share";
-import { Button } from "@/components/ui/button";
 
 interface ActionListProps<M extends BaseDataType> {
   operationConfigs: OperationConfig<M>[];
@@ -9,13 +8,18 @@ interface ActionListProps<M extends BaseDataType> {
   selectOperation: (key: OperationConfig<M>["key"]) => void;
 }
 
-export default function ActionList<M extends BaseDataType>({
-  operationConfigs = [],
-  selectedDataList = [],
-  isOperationLocked = false,
-  lockedOperation = null,
-  selectOperation,
-}: ActionListProps<M>) {
+export interface ActionItemProps<M extends BaseDataType>
+  extends ActionListProps<M> {
+  supportedActions: OperationConfig<M>[];
+}
+
+export default function ActionList<M extends BaseDataType>(
+  props: ActionListProps<M> & {
+    children?: (actionList: ActionItemProps<M>) => React.ReactNode;
+  },
+) {
+  const { operationConfigs = [], selectedDataList = [], children } = props;
+
   const selectedDataTypes = selectedDataList.map(
     (item) => item.constructor as Constructor<M>,
   );
@@ -23,30 +27,5 @@ export default function ActionList<M extends BaseDataType>({
     selectedDataTypes.every((type) => config.supportedTypes.includes(type)),
   );
 
-  return (
-    <div>
-      <div className="flex flex-wrap gap-2">
-        {supportedActions.map((config) => (
-          <Button
-            key={config.key}
-            variant={
-              !isOperationLocked
-                ? "outline"
-                : lockedOperation === config.key
-                  ? "default"
-                  : "ghost"
-            }
-            onClick={() => {
-              isOperationLocked
-                ? selectOperation(config.key)
-                : selectedDataList.map(config.action);
-            }}
-          >
-            <config.icon className="h-5 w-5" />
-            {config.label}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
+  return children?.({ ...props, supportedActions });
 }

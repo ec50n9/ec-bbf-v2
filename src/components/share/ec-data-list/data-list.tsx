@@ -13,10 +13,10 @@ interface DataListProps<
   children?: (dataList: DataItemProps<T>[]) => React.ReactNode;
 }
 
-interface DataItemProps<T extends BaseDataType> {
+export interface DataItemProps<T extends BaseDataType> {
   data: T;
   isSelected: boolean;
-  onClick: (data: T) => void;
+  onClick: () => void;
   isDisabled: boolean;
 }
 
@@ -33,7 +33,7 @@ export default function DataList<T extends BaseDataType>({
   const supportOperationTypesSet = new Set(supportOperationTypes);
 
   const newDataList: DataItemProps<T>[] = dataList.map((data) => {
-    const isSelected = selectedDataSet.has(data);
+    const isSelected = !isOperationLocked && selectedDataSet.has(data);
     return {
       data,
       isSelected,
@@ -46,5 +46,5 @@ export default function DataList<T extends BaseDataType>({
     };
   });
 
-  return <>{children?.(newDataList)}</>;
+  return children?.(newDataList);
 }
