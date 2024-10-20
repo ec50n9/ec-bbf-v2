@@ -31,17 +31,18 @@ import StudentItem from "./items/student-item";
 import StudentGroupItem from "./items/student-group-item";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { LuMoveRight } from "react-icons/lu";
 
 // Sample data
 const studentList: Student[] = [
-  new Student("1", "John", 20, "Male", 80),
-  new Student("2", "Jane", 21, "Female", 85),
-  new Student("3", "Bob", 22, "Male", 75),
+  new Student("1", "吴山茶", 20, "Male", 80),
+  new Student("2", "孙菖蒲", 21, "Female", 85),
+  new Student("3", "冯桃花", 22, "Male", 75),
 ];
 
 const studentGroupList: StudentGroup[] = [
-  new StudentGroup("11", "Group 1", [1, 2]),
-  new StudentGroup("12", "Group 2", [2, 3]),
+  new StudentGroup("11", "茉莉", [1, 2]),
+  new StudentGroup("12", "香菊", [2, 3]),
 ];
 
 export default function RollCall() {
@@ -215,6 +216,11 @@ export default function RollCall() {
           >
             {(actionWrapperList) => (
               <>
+                {isLockMode && !lockedOperation && (
+                  <div className="flex items-center gap-3">
+                    请先选择一个操作 👉
+                  </div>
+                )}
                 {actionWrapperList.map((actionWrapper) => (
                   <Button
                     key={actionWrapper.action.key}
