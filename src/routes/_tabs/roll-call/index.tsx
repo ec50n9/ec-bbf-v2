@@ -31,7 +31,6 @@ import StudentItem from "./items/student-item";
 import StudentGroupItem from "./items/student-group-item";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { LuMoveRight } from "react-icons/lu";
 
 // Sample data
 const studentList: Student[] = [
