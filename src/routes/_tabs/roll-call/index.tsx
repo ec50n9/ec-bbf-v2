@@ -29,6 +29,8 @@ import {
 } from "./share";
 import StudentItem from "./items/student-item";
 import StudentGroupItem from "./items/student-group-item";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 // Sample data
 const studentList: Student[] = [
@@ -107,15 +109,11 @@ export default function RollCall() {
     action?.(data);
   };
 
-  /** 选择操作的列表动画 */
-  const [selectOperationListParent, enableSelectOperationListAnimations] =
-    useAutoAnimate();
   /** 操作列表动画 */
-  const [actionListParent, enableActionListAnimations] = useAutoAnimate();
+  const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
   /** 数据列表动画 */
   const [dataListParent, enableDataListAnimations] = useAutoAnimate();
-  enableSelectOperationListAnimations(true);
-  enableActionListAnimations(true);
+  enableOperationListAnimations(true);
   enableDataListAnimations(true);
 
   return (
@@ -137,87 +135,108 @@ export default function RollCall() {
         </div>
       </Header>
 
-      <div className="flex flex-col gap-4">
-        {/* 已选择列表 */}
-        {!isLockMode && (
-          <div
-            ref={selectOperationListParent}
-            className="mt-4 flex items-center gap-3"
-          >
-            {/* 单/多选 */}
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="airplane-mode"
-                checked={isMultiSelect}
-                onCheckedChange={handleToggleMultiSelect}
-                disabled={isLockMode}
-              />
-              <Label htmlFor="airplane-mode">多选</Label>
-            </div>
-            {isMultiSelect && (
-              <>
-                {/* 清空选择 */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedDataList([]);
-                  }}
-                >
-                  取消选择
-                </Button>
-                {/* 全(不)选 */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleToggleAllSelect}
-                >
-                  {isAllSelected ? "全不选" : "全选"}
-                </Button>
-                {/* 反选 */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleReverseSelect}
-                >
-                  反选
-                </Button>
-              </>
-            )}
-          </div>
-        )}
+      <div className="mt-3 flex flex-col gap-3">
+        {/* 搜索项 */}
+        <div className="flex items-center gap-4 bg-[#f1e8e1] p-3 rounded-xl">
+          <Select>
+            <SelectTrigger className="w-48 bg-white">
+              <SelectValue placeholder="选择数据类型" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部</SelectItem>
+              <SelectItem value="student">仅学生</SelectItem>
+              <SelectItem value="student-group">仅分组</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Input className="w-48 bg-white" placeholder="输入关键词搜索" />
+
+          <Button size="sm" variant="default">
+            筛选
+          </Button>
+        </div>
 
         {/* 操作列表 */}
-        <ActionList
-          operationConfigs={operationConfigs}
-          selectedDataList={selectedDataList}
-          isLockMode={isLockMode}
-          lockedOperation={lockedOperation}
-          selectOperation={setLockedOperation}
-        >
-          {(actionWrapperList) => (
-            <div ref={actionListParent} className="flex flex-wrap gap-2">
-              {actionWrapperList.map((actionWrapper) => (
-                <Button
-                  key={actionWrapper.action.key}
-                  size="sm"
-                  variant={
-                    !isLockMode
-                      ? "outline"
-                      : actionWrapper.isLocked
-                        ? "default"
-                        : "ghost"
-                  }
-                  onClick={actionWrapper.onClick}
-                  disabled={!isLockMode && selectedDataList.length === 0}
-                >
-                  <actionWrapper.action.icon className="size-4" />
-                  {actionWrapper.action.label}
-                </Button>
-              ))}
-            </div>
+        <div ref={operationListParent} className="flex items-center gap-3">
+          {!isLockMode && (
+            <>
+              {/* 单/多选 */}
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="airplane-mode"
+                  checked={isMultiSelect}
+                  onCheckedChange={handleToggleMultiSelect}
+                  disabled={isLockMode}
+                />
+                <Label htmlFor="airplane-mode">多选</Label>
+              </div>
+              {isMultiSelect && (
+                <>
+                  {/* 清空选择 */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedDataList([]);
+                    }}
+                  >
+                    取消选择
+                  </Button>
+                  {/* 全(不)选 */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleToggleAllSelect}
+                  >
+                    {isAllSelected ? "全不选" : "全选"}
+                  </Button>
+                  {/* 反选 */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleReverseSelect}
+                  >
+                    反选
+                  </Button>
+
+                  <Separator orientation="vertical" />
+                </>
+              )}
+            </>
           )}
-        </ActionList>
+
+          {/* 操作列表 */}
+          <ActionList
+            operationConfigs={operationConfigs}
+            selectedDataList={selectedDataList}
+            isLockMode={isLockMode}
+            lockedOperation={lockedOperation}
+            selectOperation={setLockedOperation}
+          >
+            {(actionWrapperList) => (
+              <>
+                {actionWrapperList.map((actionWrapper) => (
+                  <Button
+                    key={actionWrapper.action.key}
+                    size="sm"
+                    variant={
+                      !isLockMode
+                        ? "outline"
+                        : actionWrapper.isLocked
+                          ? "default"
+                          : "ghost"
+                    }
+                    onClick={actionWrapper.onClick}
+                    disabled={!isLockMode && selectedDataList.length === 0}
+                  >
+                    <actionWrapper.action.icon className="size-4" />
+                    {actionWrapper.action.label}
+                  </Button>
+                ))}
+              </>
+            )}
+          </ActionList>
+        </div>
 
         {/* 数据列表 */}
         <DataList
