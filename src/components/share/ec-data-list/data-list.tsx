@@ -8,7 +8,7 @@ interface DataListProps<
   selectedDataList: T[];
   onSelect: (data: T) => void;
   onAction: (data: T) => void;
-  isOperationLocked: boolean;
+  isLockMode: boolean;
   supportOperationTypes: C[];
   children?: (dataList: DataItemProps<T>[]) => React.ReactNode;
 }
@@ -25,7 +25,7 @@ export default function DataList<T extends BaseDataType>({
   selectedDataList = [],
   onSelect,
   onAction,
-  isOperationLocked = false,
+  isLockMode = false,
   supportOperationTypes = [],
   children,
 }: DataListProps<T>) {
@@ -33,15 +33,15 @@ export default function DataList<T extends BaseDataType>({
   const supportOperationTypesSet = new Set(supportOperationTypes);
 
   const newDataList: DataItemProps<T>[] = dataList.map((data) => {
-    const isSelected = !isOperationLocked && selectedDataSet.has(data);
+    const isSelected = !isLockMode && selectedDataSet.has(data);
     return {
       data,
       isSelected,
       onClick: () => {
-        isOperationLocked ? onAction(data) : onSelect(data);
+        isLockMode ? onAction(data) : onSelect(data);
       },
       isDisabled:
-        isOperationLocked &&
+        isLockMode &&
         !supportOperationTypesSet.has(data.constructor as Constructor<T>),
     };
   });

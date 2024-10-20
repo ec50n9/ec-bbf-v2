@@ -48,7 +48,7 @@ export default function RollCall() {
   );
   const [selectedDataList, setSelectedDataList] = useState<MixedData[]>([]);
   const [isMultiSelect, setIsMultiSelect] = useState(false);
-  const [isOperationLocked, setIsOperationLocked] = useState(false);
+  const [isLockMode, setIsLockMode] = useState(false);
   const [lockedOperation, setLockedOperation] = useState<
     OperationConfig<MixedData>["key"] | null
   >(null);
@@ -73,7 +73,7 @@ export default function RollCall() {
 
   /** 操作模式切换 */
   const handleSelectOperation = (val: string) => {
-    setIsOperationLocked(val === "lock-mode");
+    setIsLockMode(val === "lock-mode");
     setLockedOperation(null);
   };
   /** 多选切换 */
@@ -126,7 +126,7 @@ export default function RollCall() {
 
       <div>
         {/* 已选择列表 */}
-        {!isOperationLocked && (
+        {!isLockMode && (
           <div className="mt-4 flex items-center gap-3">
             {/* 单/多选 */}
             <div className="flex items-center space-x-2">
@@ -134,7 +134,7 @@ export default function RollCall() {
                 id="airplane-mode"
                 checked={isMultiSelect}
                 onCheckedChange={handleToggleMultiSelect}
-                disabled={isOperationLocked}
+                disabled={isLockMode}
               />
               <Label htmlFor="airplane-mode">多选</Label>
             </div>
@@ -175,35 +175,29 @@ export default function RollCall() {
         <ActionList
           operationConfigs={operationConfigs}
           selectedDataList={selectedDataList}
-          isOperationLocked={isOperationLocked}
+          isLockMode={isLockMode}
           lockedOperation={lockedOperation}
           selectOperation={setLockedOperation}
         >
-          {({ selectOperation, supportedActions }) => (
+          {(actionWrapperList) => (
             <div className="mt-4">
               <div className="flex flex-wrap gap-2">
-                {supportedActions.map((config) => (
+                {actionWrapperList.map((actionWrapper) => (
                   <Button
-                    key={config.key}
+                    key={actionWrapper.action.key}
                     size="sm"
                     variant={
-                      !isOperationLocked
+                      !isLockMode
                         ? "outline"
-                        : lockedOperation === config.key
+                        : actionWrapper.isLocked
                           ? "default"
                           : "ghost"
                     }
-                    onClick={() => {
-                      isOperationLocked
-                        ? selectOperation(config.key)
-                        : selectedDataList.map(config.action);
-                    }}
-                    disabled={
-                      !isOperationLocked && selectedDataList.length === 0
-                    }
+                    onClick={actionWrapper.onClick}
+                    disabled={!isLockMode && selectedDataList.length === 0}
                   >
-                    <config.icon className="size-4" />
-                    {config.label}
+                    <actionWrapper.action.icon className="size-4" />
+                    {actionWrapper.action.label}
                   </Button>
                 ))}
               </div>
@@ -217,7 +211,7 @@ export default function RollCall() {
           selectedDataList={selectedDataList}
           onSelect={handleSelect}
           onAction={handleAction}
-          isOperationLocked={isOperationLocked}
+          isLockMode={isLockMode}
           supportOperationTypes={
             operationConfigs.find((config) => config.key === lockedOperation)
               ?.supportedTypes ?? []
