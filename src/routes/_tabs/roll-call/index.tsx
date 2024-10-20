@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -56,6 +57,7 @@ export default function RollCall() {
   const isAllSelected = useMemo(() => {
     return selectedDataList.length === dataList.length;
   }, [selectedDataList, dataList]);
+
   /** 全选切换 */
   const handleToggleAllSelect = () => {
     if (isAllSelected) {
@@ -105,6 +107,17 @@ export default function RollCall() {
     action?.(data);
   };
 
+  /** 选择操作的列表动画 */
+  const [selectOperationListParent, enableSelectOperationListAnimations] =
+    useAutoAnimate();
+  /** 操作列表动画 */
+  const [actionListParent, enableActionListAnimations] = useAutoAnimate();
+  /** 数据列表动画 */
+  const [dataListParent, enableDataListAnimations] = useAutoAnimate();
+  enableSelectOperationListAnimations(true);
+  enableActionListAnimations(true);
+  enableDataListAnimations(true);
+
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
       <Header title="点名">
@@ -127,7 +140,10 @@ export default function RollCall() {
       <div>
         {/* 已选择列表 */}
         {!isLockMode && (
-          <div className="mt-4 flex items-center gap-3">
+          <div
+            ref={selectOperationListParent}
+            className="mt-4 flex items-center gap-3"
+          >
             {/* 单/多选 */}
             <div className="flex items-center space-x-2">
               <Switch
@@ -181,7 +197,7 @@ export default function RollCall() {
         >
           {(actionWrapperList) => (
             <div className="mt-4">
-              <div className="flex flex-wrap gap-2">
+              <div ref={actionListParent} className="flex flex-wrap gap-2">
                 {actionWrapperList.map((actionWrapper) => (
                   <Button
                     key={actionWrapper.action.key}
@@ -218,7 +234,7 @@ export default function RollCall() {
           }
         >
           {(dataList) => (
-            <div className="mt-4 grid grid-cols-5 gap-3">
+            <div ref={dataListParent} className="mt-4 grid grid-cols-5 gap-3">
               {dataList
                 .filter((item) => !item.isDisabled)
                 .map((item) => (
@@ -245,12 +261,7 @@ export default function RollCall() {
   );
 }
 
-function DataItemView({
-  data,
-  isSelected,
-  onClick,
-  isDisabled,
-}: DataItemProps<MixedData>) {
+function DataItemView({ data, isDisabled }: DataItemProps<MixedData>) {
   if (data instanceof Student) {
     return <StudentItem data={data} />;
   }
