@@ -137,7 +137,7 @@ export default function RollCall() {
         </div>
       </Header>
 
-      <div>
+      <div className="flex flex-col gap-4">
         {/* 已选择列表 */}
         {!isLockMode && (
           <div
@@ -196,27 +196,25 @@ export default function RollCall() {
           selectOperation={setLockedOperation}
         >
           {(actionWrapperList) => (
-            <div className="mt-4">
-              <div ref={actionListParent} className="flex flex-wrap gap-2">
-                {actionWrapperList.map((actionWrapper) => (
-                  <Button
-                    key={actionWrapper.action.key}
-                    size="sm"
-                    variant={
-                      !isLockMode
-                        ? "outline"
-                        : actionWrapper.isLocked
-                          ? "default"
-                          : "ghost"
-                    }
-                    onClick={actionWrapper.onClick}
-                    disabled={!isLockMode && selectedDataList.length === 0}
-                  >
-                    <actionWrapper.action.icon className="size-4" />
-                    {actionWrapper.action.label}
-                  </Button>
-                ))}
-              </div>
+            <div ref={actionListParent} className="flex flex-wrap gap-2">
+              {actionWrapperList.map((actionWrapper) => (
+                <Button
+                  key={actionWrapper.action.key}
+                  size="sm"
+                  variant={
+                    !isLockMode
+                      ? "outline"
+                      : actionWrapper.isLocked
+                        ? "default"
+                        : "ghost"
+                  }
+                  onClick={actionWrapper.onClick}
+                  disabled={!isLockMode && selectedDataList.length === 0}
+                >
+                  <actionWrapper.action.icon className="size-4" />
+                  {actionWrapper.action.label}
+                </Button>
+              ))}
             </div>
           )}
         </ActionList>
@@ -234,7 +232,7 @@ export default function RollCall() {
           }
         >
           {(dataList) => (
-            <div ref={dataListParent} className="mt-4 grid grid-cols-5 gap-3">
+            <div ref={dataListParent} className="grid grid-cols-5 gap-3">
               {dataList
                 .filter((item) => !item.isDisabled)
                 .map((item) => (
