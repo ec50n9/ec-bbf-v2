@@ -29,7 +29,7 @@ export default function Root() {
 
   useEffect(() => {
     // TODO: 检查登录状态
-    gotoLogin();
+    // gotoLogin();
   }, [gotoLogin]);
 
   return (
