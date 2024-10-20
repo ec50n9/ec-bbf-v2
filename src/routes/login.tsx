@@ -1,28 +1,70 @@
+import { useState, useRef, useEffect } from "react";
 import { LuSchool2, LuBookPlus, LuBadgeCheck } from "react-icons/lu";
 import Header from "@/components/share/header";
 import Step from "@/components/login/step";
 import ClassForm from "@/components/login/class-form";
+import SubjectForm from "@/components/login/subject-form";
+import EverythingReady from "@/components/login/everything-ready";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
+import "swiper/css";
+
+const steps = [
+  {
+    name: "创建班级",
+    icon: LuSchool2,
+    content: ClassForm,
+    title: "您好，初次见面！",
+    description: "请允许我更好地了解您，让我们从下方的问题开始吧",
+  },
+  {
+    name: "添加课程",
+    icon: LuBookPlus,
+    content: SubjectForm,
+    title: "放轻松，马上就绪",
+    description: "在此之前，让我再了解您多一点",
+  },
+  {
+    name: "准备就绪",
+    icon: LuBadgeCheck,
+    content: EverythingReady,
+    title: "一切就绪！",
+    description: "“启元“已经准备好开始新的教学方式了，您呢？",
+  },
+] as const;
 
 export default function LoginView() {
+  const [current, setCurrent] = useState(0);
+
+  const swiperRef = useRef<SwiperType>();
+  useEffect(() => {
+    swiperRef.current?.slideTo(current);
+  }, [current]);
+
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="">
       <Header
-        className="mx-5"
-        title="您好！初次见面"
-        description="请允许我更好地了解您，让我们从下方的问题开始吧"
+        className="max-w-xl mx-auto"
+        title={steps[current].title}
+        description={steps[current].description}
       />
-      <Step
-        className="mx-5 mt-9"
-        steps={[
-          { name: "创建班级", icon: LuSchool2 },
-          { name: "添加课程", icon: LuBookPlus },
-          { name: "启动！！", icon: LuBadgeCheck },
-        ]}
-        current={0}
-      />
-      <div className="my-9 mx-auto w-96">
-        <ClassForm />
-      </div>
+      <Step className="max-w-xl mx-auto mt-9" steps={steps} current={current} />
+      <Swiper
+        autoHeight
+        allowTouchMove={false}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+      >
+        {steps.map((step) => (
+          <SwiperSlide
+            key={step.name}
+            className="relative w-full overflow-x-hidden"
+          >
+            <step.content onSuccess={() => setCurrent(current + 1)} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 }

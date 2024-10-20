@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import ActionButton from "@/components/login/action-button";
 import { useForm } from "react-hook-form";
+import type { StepFormProps } from "./share";
 
 /** 年级分组 */
 const gradeGroups = [
@@ -62,7 +63,7 @@ const classFormSchema = z.object({
   class: z.string().max(10, "长度不能大于 10").optional(),
 });
 
-export default function ClassForm() {
+export default function ClassForm(props: StepFormProps) {
   const form = useForm<z.infer<typeof classFormSchema>>({
     resolver: zodResolver(classFormSchema),
     defaultValues: {
@@ -74,72 +75,83 @@ export default function ClassForm() {
 
   function onSubmit(values: z.infer<typeof classFormSchema>) {
     console.log("on submit", values);
+    props.onSuccess?.();
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>班级名称</FormLabel>
-              <FormControl>
-                <Input placeholder="输入班级名称" {...field} />
-              </FormControl>
-              <FormDescription>这是您的公开显示名称</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="grade"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>年级</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <div className="my-9 mx-auto w-96">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-y-8"
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>班级名称</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择年级" />
-                  </SelectTrigger>
+                  <Input placeholder="输入班级名称" {...field} />
                 </FormControl>
-                <SelectContent side="bottom" className="h-60">
-                  {gradeGroups.map((group) => (
-                    <SelectGroup key={group.name}>
-                      <SelectLabel>{group.name}</SelectLabel>
-                      {group.children.map((child) => (
-                        <SelectItem key={child.id} value={child.id}>
-                          {child.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>选择班级所在的年级</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="class"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>班别</FormLabel>
-              <FormControl>
-                <Input placeholder="输入班别" type="number" {...field} />
-              </FormControl>
-              <FormDescription>1 = 1 班、2 = 2 班，以此类推...</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>这是您的公开显示名称</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="grade"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>年级</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="选择年级" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent side="bottom" className="h-60">
+                    {gradeGroups.map((group) => (
+                      <SelectGroup key={group.name}>
+                        <SelectLabel>{group.name}</SelectLabel>
+                        {group.children.map((child) => (
+                          <SelectItem key={child.id} value={child.id}>
+                            {child.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>选择班级所在的年级</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="class"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>班别</FormLabel>
+                <FormControl>
+                  <Input placeholder="输入班别" type="number" {...field} />
+                </FormControl>
+                <FormDescription>
+                  1 = 1 班、2 = 2 班，以此类推...
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <ActionButton className="self-end rounded-full">下一步</ActionButton>
-      </form>
-    </Form>
+          <ActionButton className="self-end rounded-full">下一步</ActionButton>
+        </form>
+      </Form>
+    </div>
   );
 }

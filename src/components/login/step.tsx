@@ -8,7 +8,7 @@ export type Step = {
 
 export default function Step(props: {
   className?: string;
-  steps: Step[];
+  steps: readonly Step[];
   current?: number;
 }) {
   const steps = props.steps;
@@ -21,9 +21,11 @@ export default function Step(props: {
       <div>
         <div className="overflow-hidden rounded-full bg-gray-200">
           <div
-            className={cn("h-2 rounded-full bg-blue-500")}
+            className={cn(
+              "h-2 rounded-full bg-blue-500 transition-width duration-500 ease-in-out",
+            )}
             style={{
-              width: `${Math.max(0.05, current / (steps.length - 1)) * 100}%`,
+              width: `${Math.max(0.08, current / (steps.length - 1)) * 100}%`,
             }}
           />
         </div>
