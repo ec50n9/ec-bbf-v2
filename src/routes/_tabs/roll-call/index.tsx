@@ -1,16 +1,12 @@
-import {
-  DataList,
-  type OperationConfig,
-} from "@/components/share/ec-data-list";
+import type { OperationConfig } from "@/components/share/ec-data-list";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMemo, useState } from "react";
 import DataOperations from "./components/data-operations";
 import FilterBar from "./components/filter-bar";
 import SelectOperations from "./components/select-operations";
 import TitleBar from "./components/title-bar";
-import CommonItem from "./items/common-item";
+import DataList from "./components/data-list";
 import {
   operationConfigs,
   Student,
@@ -78,10 +74,7 @@ export default function RollCall() {
 
   /** 操作列表动画 */
   const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
-  /** 数据列表动画 */
-  const [dataListParent, enableDataListAnimations] = useAutoAnimate();
   enableOperationListAnimations(true);
-  enableDataListAnimations(true);
 
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
@@ -125,35 +118,8 @@ export default function RollCall() {
           onSelect={handleSelect}
           onAction={handleAction}
           isLockMode={isLockMode}
-          supportOperationTypes={
-            operationConfigs.find((config) => config.key === lockedOperation)
-              ?.supportedTypes ?? []
-          }
-        >
-          {(dataList) => (
-            <div ref={dataListParent} className="grid grid-cols-5 gap-3">
-              {dataList
-                .filter((item) => !item.isDisabled)
-                .map((item) => (
-                  <div
-                    key={item.data.id}
-                    onClick={item.onClick}
-                    onKeyDown={(e) => {
-                      e.key === "Enter" && item.onClick();
-                    }}
-                    className={cn(
-                      "rounded-lg cursor-pointer",
-                      "transform transition-all duration-300 ease-in-out",
-                      "outline outline-0 outline-offset-2 outline-ring",
-                      item.isSelected && "scale-90 outline-4",
-                    )}
-                  >
-                    <CommonItem {...item} />
-                  </div>
-                ))}
-            </div>
-          )}
-        </DataList>
+          lockedOperation={lockedOperation}
+        />
       </div>
     </div>
   );
