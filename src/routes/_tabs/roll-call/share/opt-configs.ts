@@ -5,7 +5,7 @@ import { type MixedData, Student, StudentGroup } from "./types";
 export const operationConfigs: OperationConfig<MixedData>[] = [
   {
     key: "delete",
-    label: "删除(s|g|e)",
+    label: "删除",
     icon: LuTrash,
     supportedTypes: [Student, StudentGroup],
     action: (data) => {
@@ -14,7 +14,7 @@ export const operationConfigs: OperationConfig<MixedData>[] = [
   },
   {
     key: "addScore",
-    label: "加分(s|g)",
+    label: "加分",
     icon: LuPlus,
     supportedTypes: [Student],
     action: (data) => {
@@ -23,7 +23,7 @@ export const operationConfigs: OperationConfig<MixedData>[] = [
   },
   {
     key: "subtractScore",
-    label: "扣分(s|g)",
+    label: "扣分",
     icon: LuMinus,
     supportedTypes: [Student],
     action: (data) => {

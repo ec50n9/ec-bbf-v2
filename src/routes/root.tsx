@@ -19,6 +19,7 @@ import {
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons/lib";
+import { ThemeModeToggle } from "@/components/share/theme-mode-toggle";
 
 export default function Root() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function Root() {
   }, [gotoLogin]);
 
   return (
-    <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-[#faf7f5] text-slate-900 overflow-hidden">
+    <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-background text-foreground overflow-hidden">
       <SideBar className="rounded-2xl" />
       <div className="overflow-auto">
         <Outlet />
@@ -56,7 +57,10 @@ function SideBar(props: { className?: string }) {
       { name: "倒计时", icon: LuAlarmClock, path: "/countdown" },
       { name: "排行榜", icon: LuAward, path: "/ranking-list" },
     ],
-    bottom: [{ name: "设置", icon: LuSettings, path: "/settings" }],
+    bottom: [
+      { name: "主题", component: ThemeModeToggle },
+      { name: "设置", icon: LuSettings, path: "/settings" },
+    ],
   };
 
   const handleOnNavigation = (path: string) => {
@@ -66,7 +70,8 @@ function SideBar(props: { className?: string }) {
   return (
     <div
       className={cn(
-        "ml-4 my-4 flex flex-col justify-between items-center gap-8 bg-[#f1e8e1] p-4",
+        "ml-4 my-4 flex flex-col justify-between items-center gap-8 p-4",
+        "bg-card text-foreground border border-solid border-border",
         props.className,
       )}
     >
@@ -94,14 +99,18 @@ function SideBar(props: { className?: string }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        {routes.bottom.map((item) => (
-          <NavItem
-            key={item.name}
-            {...item}
-            selected={location.pathname === item.path}
-            onNavigate={handleOnNavigation}
-          />
-        ))}
+        {routes.bottom.map((item) =>
+          item.component ? (
+            <item.component key={item.name} />
+          ) : (
+            <NavItem
+              key={item.name}
+              {...item}
+              selected={location.pathname === item.path}
+              onNavigate={handleOnNavigation}
+            />
+          ),
+        )}
         <Avatar className="size-8">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>

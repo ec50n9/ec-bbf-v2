@@ -118,7 +118,7 @@ export default function RollCall() {
 
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
-      <Header title="点名">
+      <Header title="点名" description="查看所有学生">
         <div className="flex items-center space-x-4">
           <Select defaultValue="normal" onValueChange={handleSelectOperation}>
             <SelectTrigger className="w-[180px]">
@@ -137,9 +137,14 @@ export default function RollCall() {
 
       <div className="mt-3 flex flex-col gap-3">
         {/* 搜索项 */}
-        <div className="flex items-center gap-4 bg-[#f1e8e1] p-3 rounded-xl">
+        <div
+          className={cn(
+            "flex items-center gap-4 p-3 rounded-xl",
+            "bg-card border border-border",
+          )}
+        >
           <Select>
-            <SelectTrigger className="w-48 bg-white">
+            <SelectTrigger className="w-48">
               <SelectValue placeholder="选择数据类型" />
             </SelectTrigger>
             <SelectContent>
@@ -149,7 +154,7 @@ export default function RollCall() {
             </SelectContent>
           </Select>
 
-          <Input className="w-48 bg-white" placeholder="输入关键词搜索" />
+          <Input className="w-48" placeholder="输入关键词搜索" />
 
           <Button size="sm" variant="default">
             筛选
@@ -267,9 +272,10 @@ export default function RollCall() {
                       e.key === "Enter" && item.onClick();
                     }}
                     className={cn(
-                      "rounded-lg  transform transition-all duration-300 ease-in-out",
-                      "outline outline-0 outline-offset-0 outline-blue-200",
-                      item.isSelected && "scale-90 outline-8",
+                      "rounded-lg cursor-pointer",
+                      "transform transition-all duration-300 ease-in-out",
+                      "outline outline-0 outline-offset-2 outline-ring",
+                      item.isSelected && "scale-90 outline-4",
                     )}
                   >
                     <DataItemView {...item} />

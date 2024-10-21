@@ -1,4 +1,10 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
+import {
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 import Database from "@tauri-apps/plugin-sql";
 import createTablesSQL from "@/assets/sql/create-tables.sql?raw";
 
@@ -63,4 +69,12 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
       {children}
     </DatabaseContext.Provider>
   );
+}
+
+export function useDatabase() {
+  const context = useContext(DatabaseContext);
+  if (context === undefined) {
+    throw new Error("useDatabase must be used within a DatabaseProvider");
+  }
+  return context;
 }

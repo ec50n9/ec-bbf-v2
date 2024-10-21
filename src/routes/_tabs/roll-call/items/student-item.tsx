@@ -6,7 +6,7 @@ interface StudentItemProps {
 
 export default function StudentItem({ data }: StudentItemProps) {
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm shadow-indigo-100">
+    <div className="bg-card border border-border rounded-lg p-4">
       {data.name}
     </div>
   );
