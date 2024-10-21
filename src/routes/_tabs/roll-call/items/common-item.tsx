@@ -1,7 +1,7 @@
-import { Student, StudentGroup, type MixedData } from "../share";
 import type { DataItemProps } from "@/components/share/ec-data-list";
 import StudentItem from "./student-item";
 import StudentGroupItem from "./student-group-item";
+import { type MixedData, Student, StudentGroup } from "@/services/types";
 
 export default function CommonItem({
   data,

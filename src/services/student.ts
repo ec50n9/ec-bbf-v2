@@ -1,12 +1,5 @@
 import type Database from "@tauri-apps/plugin-sql";
-
-export type Student = {
-  id: number;
-  name: string;
-  stu_no: string;
-  class_id: number;
-  subject_id: number;
-};
+import type { Student } from "./types";
 
 // 插入学生记录
 export const insertStudent = async (
@@ -15,7 +8,7 @@ export const insertStudent = async (
 ) => {
   const res = await db.execute(
     "INSERT INTO student (name, stu_no, class_id, subject_id) VALUES (?, ?, ?, ?)",
-    [student.name, student.stu_no, student.class_id, student.subject_id],
+    [student.name, student.stuNo, student.classId, student.subjectId],
   );
   return res;
 };
@@ -32,9 +25,9 @@ export const updateStudent = async (db: Database, student: Student) => {
     "UPDATE student SET name = ?, stu_no = ?, class_id = ?, subject_id = ? WHERE id = ?",
     [
       student.name,
-      student.stu_no,
-      student.class_id,
-      student.subject_id,
+      student.stuNo,
+      student.classId,
+      student.subjectId,
       student.id,
     ],
   );

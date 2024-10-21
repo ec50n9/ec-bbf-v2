@@ -8,46 +8,26 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useMemo } from "react";
-import type { MixedData } from "../share";
+import {
+  useManualSelectorStore,
+  useStudentStore,
+} from "@/stores/student-store";
 
 /** 选择操作 */
-export default function SelectOperations(props: {
-  isLockMode: boolean;
-  allDataList: MixedData[];
-  selectedDataList: MixedData[];
-  setSelectedDataList: (val: MixedData[]) => void;
-  isMultiSelect: boolean;
-  handleToggleMultiSelect: (val: boolean) => void;
-}) {
-  const {
-    isLockMode,
-    allDataList,
-    selectedDataList,
-    setSelectedDataList,
-    isMultiSelect,
-    handleToggleMultiSelect,
-  } = props;
+export default function SelectOperations() {
+  const isLockMode = useStudentStore((s) => s.isLockMode);
+  const isAllSelected = useStudentStore((s) => s.isAllSelected());
+  const selectedDataList = useStudentStore((s) => s.selectedDataList);
+  const updateSelectedDataList = useStudentStore(
+    (s) => s.updateSelectedDataList,
+  );
 
-  const isAllSelected = useMemo(() => {
-    return selectedDataList.length === allDataList.length;
-  }, [selectedDataList, allDataList]);
-
-  /** 全选切换 */
-  const handleToggleAllSelect = () => {
-    if (isAllSelected) {
-      setSelectedDataList([]);
-    } else {
-      setSelectedDataList([...allDataList]);
-    }
-  };
-
-  /** 反选 */
-  const handleReverseSelect = () => {
-    setSelectedDataList(
-      allDataList.filter((item) => !selectedDataList.includes(item)),
-    );
-  };
+  const isMultiSelect = useManualSelectorStore((s) => s.isMultiSelect);
+  const updateIsMultiSelect = useManualSelectorStore(
+    (s) => s.updateIsMultiSelect,
+  );
+  const toggleAllSelect = useManualSelectorStore((s) => s.toggleAllSelect);
+  const reverseSelect = useManualSelectorStore((s) => s.reverseSelect);
 
   return (
     <>
@@ -66,7 +46,7 @@ export default function SelectOperations(props: {
         <Switch
           id="airplane-mode"
           checked={isMultiSelect}
-          onCheckedChange={handleToggleMultiSelect}
+          onCheckedChange={updateIsMultiSelect}
           disabled={isLockMode}
         />
         <Label htmlFor="airplane-mode">多选</Label>
@@ -79,18 +59,18 @@ export default function SelectOperations(props: {
               size="sm"
               variant="outline"
               onClick={() => {
-                setSelectedDataList([]);
+                updateSelectedDataList([]);
               }}
             >
               取消选择
             </Button>
           )}
           {/* 全(不)选 */}
-          <Button size="sm" variant="outline" onClick={handleToggleAllSelect}>
+          <Button size="sm" variant="outline" onClick={toggleAllSelect}>
             {isAllSelected ? "全不选" : "全选"}
           </Button>
           {/* 反选 */}
-          <Button size="sm" variant="outline" onClick={handleReverseSelect}>
+          <Button size="sm" variant="outline" onClick={reverseSelect}>
             反选
           </Button>
         </>

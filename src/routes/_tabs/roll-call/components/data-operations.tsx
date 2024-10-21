@@ -1,59 +1,53 @@
-import {
-  type OperationConfig,
-  ActionList,
-} from "@/components/share/ec-data-list";
+import type { Constructor } from "@/components/share/ec-data-list/share";
 import { Button } from "@/components/ui/button";
-import type { MixedData } from "../share";
+import type { MixedData } from "@/services/types";
+import { useStudentStore } from "@/stores/student-store";
 
 /** 操作列表 */
-export default function DataOperations(props: {
-  isLockMode: boolean;
-  operationConfigs: OperationConfig<MixedData>[];
-  selectedDataList: MixedData[];
-  lockedOperation: OperationConfig<MixedData>["key"] | null;
-  setLockedOperation: (key: OperationConfig<MixedData>["key"]) => void;
-}) {
-  const {
-    isLockMode,
-    operationConfigs,
-    selectedDataList,
-    lockedOperation,
-    setLockedOperation,
-  } = props;
+export default function DataOperations() {
+  const isLockMode = useStudentStore((s) => s.isLockMode);
+  const lockedOperationKey = useStudentStore((s) => s.lockedOperationKey);
+  const selectedDataList = useStudentStore((s) => s.selectedDataList);
+  const operationConfigs = useStudentStore((s) => s.operationConfigs);
+  const updateLockedOperationKey = useStudentStore(
+    (s) => s.updateLockedOperationKey,
+  );
+
+  // const selectedDateTypes = useStudentStore((s) => s.selectedDataTypes());
+  // const supportedActions = useStudentStore((s) => s.supportedActions());
+
+  const selectedDataTypes = selectedDataList.map(
+    (i) => i.constructor as Constructor<MixedData>,
+  );
+  const supportedActions = operationConfigs.filter((c) =>
+    selectedDataTypes.every((t) => c.supportedTypes.includes(t)),
+  );
 
   return (
-    <ActionList
-      operationConfigs={operationConfigs}
-      selectedDataList={selectedDataList}
-      isLockMode={isLockMode}
-      lockedOperation={lockedOperation}
-      selectOperation={setLockedOperation}
-    >
-      {(actionWrapperList) => (
-        <>
-          {isLockMode && !lockedOperation && (
-            <div className="flex items-center gap-3">请先选择一个操作 👉</div>
-          )}
-          {actionWrapperList.map((actionWrapper) => (
-            <Button
-              key={actionWrapper.action.key}
-              size="sm"
-              variant={
-                !isLockMode
-                  ? "outline"
-                  : actionWrapper.isLocked
-                    ? "default"
-                    : "ghost"
-              }
-              onClick={actionWrapper.onClick}
-              disabled={!isLockMode && selectedDataList.length === 0}
-            >
-              <actionWrapper.action.icon className="size-4" />
-              {actionWrapper.action.label}
-            </Button>
-          ))}
-        </>
+    <>
+      {isLockMode && !lockedOperationKey && (
+        <div className="flex items-center gap-3">请先选择一个操作 👉</div>
       )}
-    </ActionList>
+      {supportedActions.map((action) => {
+        const isLocked = lockedOperationKey === action.key;
+        const handleOnClick = () =>
+          isLockMode
+            ? updateLockedOperationKey(action.key)
+            : selectedDataList.map(action.action);
+
+        return (
+          <Button
+            key={action.key}
+            size="sm"
+            variant={!isLockMode ? "outline" : isLocked ? "default" : "ghost"}
+            onClick={handleOnClick}
+            disabled={!isLockMode && selectedDataList.length === 0}
+          >
+            <action.icon className="size-4" />
+            {action.label}
+          </Button>
+        );
+      })}
+    </>
   );
 }

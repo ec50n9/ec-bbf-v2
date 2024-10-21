@@ -1,6 +1,6 @@
 import { LuPlus, LuMinus, LuTrash } from "react-icons/lu";
 import type { OperationConfig } from "@/components/share/ec-data-list";
-import { type MixedData, Student, StudentGroup } from "./types";
+import { type MixedData, Student, StudentGroup } from "@/services/types";
 
 export const operationConfigs: OperationConfig<MixedData>[] = [
   {

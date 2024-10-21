@@ -4,9 +4,9 @@ export class Student implements BaseDataType {
   constructor(
     public id: string,
     public name: string,
-    public age: number,
-    public gender: "Male" | "Female",
-    public score: number,
+    public stuNo: string,
+    public classId: number,
+    public subjectId: number,
   ) {}
 }
 
@@ -14,6 +14,7 @@ export class StudentGroup implements BaseDataType {
   constructor(
     public id: string,
     public name: string,
+    public subjectId: number,
     public studentIds: number[],
   ) {}
 }
