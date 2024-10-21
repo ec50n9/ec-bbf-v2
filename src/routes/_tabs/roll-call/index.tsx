@@ -179,15 +179,17 @@ export default function RollCall() {
               {isMultiSelect && (
                 <>
                   {/* 清空选择 */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedDataList([]);
-                    }}
-                  >
-                    取消选择
-                  </Button>
+                  {!!selectedDataList.length && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedDataList([]);
+                      }}
+                    >
+                      取消选择
+                    </Button>
+                  )}
                   {/* 全(不)选 */}
                   <Button
                     size="sm"
