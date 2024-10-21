@@ -121,14 +121,15 @@ export default function RollCall() {
       <Header title="点名" description="查看所有学生">
         <div className="flex items-center space-x-4">
           <Select defaultValue="normal" onValueChange={handleSelectOperation}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-36">
+              <span className="text-muted-foreground">模式:</span>
               <SelectValue placeholder="选择操作模式" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>操作模式</SelectLabel>
-                <SelectItem value="normal">普通模式</SelectItem>
-                <SelectItem value="lock-mode">锁定操作模式</SelectItem>
+                <SelectItem value="normal">选择</SelectItem>
+                <SelectItem value="lock-mode">锁定操作</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -139,12 +140,12 @@ export default function RollCall() {
         {/* 搜索项 */}
         <div
           className={cn(
-            "flex items-center gap-4 p-3 rounded-xl",
+            "flex items-center gap-4 p-3 rounded-2xl",
             "bg-card border border-border",
           )}
         >
-          <Select>
-            <SelectTrigger className="w-48">
+          <Select defaultValue="all">
+            <SelectTrigger className="w-28">
               <SelectValue placeholder="选择数据类型" />
             </SelectTrigger>
             <SelectContent>
@@ -154,7 +155,7 @@ export default function RollCall() {
             </SelectContent>
           </Select>
 
-          <Input className="w-48" placeholder="输入关键词搜索" />
+          <Input className="w-40" placeholder="输入关键词搜索" />
 
           <Button size="sm" variant="default">
             筛选
@@ -203,12 +204,12 @@ export default function RollCall() {
                   >
                     反选
                   </Button>
-
-                  <Separator orientation="vertical" />
                 </>
               )}
             </>
           )}
+
+          <Separator orientation="vertical" />
 
           {/* 操作列表 */}
           <ActionList
