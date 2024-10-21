@@ -76,7 +76,7 @@ function SideBar(props: { className?: string }) {
       )}
     >
       <div className="flex flex-col items-center gap-4">
-        <LuSquirrel className="text-3xl" />
+        <LuSquirrel className="text-3xl text-orange-600 drop-shadow-lg" />
         {routes.top.map((item) => (
           <NavItem
             key={item.name}
@@ -111,10 +111,6 @@ function SideBar(props: { className?: string }) {
             />
           ),
         )}
-        <Avatar className="size-8">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
       </div>
     </div>
   );
