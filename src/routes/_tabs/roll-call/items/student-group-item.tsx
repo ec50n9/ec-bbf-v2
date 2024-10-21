@@ -6,7 +6,7 @@ interface StudentGroupItemProps {
 
 export default function StudentGroupItem({ data }: StudentGroupItemProps) {
   return (
-    <div className="bg-card border border-border text-primary rounded-lg p-4">
+    <div className="bg-card border border-border text-primary rounded-lg px-4 py-2">
       {data.name}
     </div>
   );

@@ -8,7 +8,7 @@ export default function Header(props: {
 }) {
   return (
     <header
-      className={cn("pt-9 flex justify-between items-center", props.className)}
+      className={cn("pt-4 flex justify-between items-center", props.className)}
     >
       <div>
         <h1 className="text-4xl text-foreground font-medium leading-snug">
