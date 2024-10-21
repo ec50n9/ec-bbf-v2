@@ -1,36 +1,22 @@
-import { useState, useMemo } from "react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-import Header from "@/components/share/header";
-import {
-  ActionList,
   DataList,
   type OperationConfig,
-  type DataItemProps,
 } from "@/components/share/ec-data-list";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useMemo, useState } from "react";
+import DataOperations from "./components/data-operations";
+import FilterBar from "./components/filter-bar";
+import SelectOperations from "./components/select-operations";
+import TitleBar from "./components/title-bar";
+import CommonItem from "./items/common-item";
 import {
+  operationConfigs,
   Student,
   StudentGroup,
   type MixedData,
-  operationConfigs,
 } from "./share";
-import StudentItem from "./items/student-item";
-import StudentGroupItem from "./items/student-group-item";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 
 // Sample data
 const studentList: Student[] = [
@@ -55,25 +41,6 @@ export default function RollCall() {
   const [lockedOperation, setLockedOperation] = useState<
     OperationConfig<MixedData>["key"] | null
   >(null);
-
-  const isAllSelected = useMemo(() => {
-    return selectedDataList.length === dataList.length;
-  }, [selectedDataList, dataList]);
-
-  /** 全选切换 */
-  const handleToggleAllSelect = () => {
-    if (isAllSelected) {
-      setSelectedDataList([]);
-    } else {
-      setSelectedDataList([...dataList]);
-    }
-  };
-  /** 反选 */
-  const handleReverseSelect = () => {
-    setSelectedDataList(
-      dataList.filter((item) => !selectedDataList.includes(item)),
-    );
-  };
 
   /** 操作模式切换 */
   const handleSelectOperation = (val: string) => {
@@ -118,137 +85,37 @@ export default function RollCall() {
 
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
-      <Header title="点名" description="查看所有学生">
-        <div className="flex items-center space-x-4">
-          <Select defaultValue="normal" onValueChange={handleSelectOperation}>
-            <SelectTrigger className="w-36">
-              <span className="text-muted-foreground">模式:</span>
-              <SelectValue placeholder="选择操作模式" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>操作模式</SelectLabel>
-                <SelectItem value="normal">选择</SelectItem>
-                <SelectItem value="lock-mode">锁定操作</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </Header>
+      <TitleBar handleSelectOperation={handleSelectOperation} />
 
       <div className="mt-3 flex flex-col gap-3">
         {/* 搜索项 */}
-        <div
-          className={cn(
-            "flex items-center gap-4 p-3 rounded-2xl",
-            "bg-card border border-border",
-          )}
-        >
-          <Select defaultValue="all">
-            <SelectTrigger className="w-28">
-              <SelectValue placeholder="选择数据类型" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全部</SelectItem>
-              <SelectItem value="student">仅学生</SelectItem>
-              <SelectItem value="student-group">仅分组</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Input className="w-40" placeholder="输入关键词搜索" />
-
-          <Button size="sm" variant="default">
-            筛选
-          </Button>
-        </div>
+        <FilterBar />
 
         {/* 操作列表 */}
         <div ref={operationListParent} className="flex items-center gap-3">
           {!isLockMode && (
             <>
-              {/* 单/多选 */}
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="airplane-mode"
-                  checked={isMultiSelect}
-                  onCheckedChange={handleToggleMultiSelect}
-                  disabled={isLockMode}
-                />
-                <Label htmlFor="airplane-mode">多选</Label>
-              </div>
-              {isMultiSelect && (
-                <>
-                  {/* 清空选择 */}
-                  {!!selectedDataList.length && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedDataList([]);
-                      }}
-                    >
-                      取消选择
-                    </Button>
-                  )}
-                  {/* 全(不)选 */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleToggleAllSelect}
-                  >
-                    {isAllSelected ? "全不选" : "全选"}
-                  </Button>
-                  {/* 反选 */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleReverseSelect}
-                  >
-                    反选
-                  </Button>
-                </>
-              )}
+              <SelectOperations
+                isLockMode={isLockMode}
+                allDataList={dataList}
+                selectedDataList={selectedDataList}
+                setSelectedDataList={setSelectedDataList}
+                isMultiSelect={isMultiSelect}
+                handleToggleMultiSelect={handleToggleMultiSelect}
+              />
+
+              <Separator orientation="vertical" />
             </>
           )}
 
-          <Separator orientation="vertical" />
-
           {/* 操作列表 */}
-          <ActionList
+          <DataOperations
+            isLockMode={isLockMode}
             operationConfigs={operationConfigs}
             selectedDataList={selectedDataList}
-            isLockMode={isLockMode}
             lockedOperation={lockedOperation}
-            selectOperation={setLockedOperation}
-          >
-            {(actionWrapperList) => (
-              <>
-                {isLockMode && !lockedOperation && (
-                  <div className="flex items-center gap-3">
-                    请先选择一个操作 👉
-                  </div>
-                )}
-                {actionWrapperList.map((actionWrapper) => (
-                  <Button
-                    key={actionWrapper.action.key}
-                    size="sm"
-                    variant={
-                      !isLockMode
-                        ? "outline"
-                        : actionWrapper.isLocked
-                          ? "default"
-                          : "ghost"
-                    }
-                    onClick={actionWrapper.onClick}
-                    disabled={!isLockMode && selectedDataList.length === 0}
-                  >
-                    <actionWrapper.action.icon className="size-4" />
-                    {actionWrapper.action.label}
-                  </Button>
-                ))}
-              </>
-            )}
-          </ActionList>
+            setLockedOperation={setLockedOperation}
+          />
         </div>
 
         {/* 数据列表 */}
@@ -281,7 +148,7 @@ export default function RollCall() {
                       item.isSelected && "scale-90 outline-4",
                     )}
                   >
-                    <DataItemView {...item} />
+                    <CommonItem {...item} />
                   </div>
                 ))}
             </div>
@@ -290,13 +157,4 @@ export default function RollCall() {
       </div>
     </div>
   );
-}
-
-function DataItemView({ data, isDisabled }: DataItemProps<MixedData>) {
-  if (data instanceof Student) {
-    return <StudentItem data={data} />;
-  }
-  if (data instanceof StudentGroup) {
-    return <StudentGroupItem data={data} />;
-  }
 }
