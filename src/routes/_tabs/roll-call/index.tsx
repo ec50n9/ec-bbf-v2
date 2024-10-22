@@ -2,13 +2,23 @@ import { Separator } from "@/components/ui/separator";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import DataOperations from "./components/data-operations";
 import FilterBar from "./components/filter-bar";
-import SelectOperations from "./components/select-operations";
 import TitleBar from "./components/title-bar";
 import DataList from "./components/data-list";
 import { operationConfigs } from "./share";
 import { Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
 import { useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ManualSelector,
+  useManualSelectorStore,
+} from "./selectors/manual-selector";
 
 // Sample data
 const studentList: Student[] = [
@@ -24,9 +34,6 @@ const studentGroupList: StudentGroup[] = [
 
 export default function RollCall() {
   const updateAllDataList = useStudentStore((s) => s.updateAllDataList);
-  const updateSelectedDataList = useStudentStore(
-    (s) => s.updateSelectedDataList,
-  );
   const isLockMode = useStudentStore((s) => s.isLockMode);
   const updateIsLockMode = useStudentStore((s) => s.updateIsLockMode);
   const updateLockedOperation = useStudentStore(
@@ -51,6 +58,9 @@ export default function RollCall() {
     updateIsLockMode(val === "lock-mode");
   };
 
+  /** 选择器 */
+  const onSelect = useManualSelectorStore((s) => s.onSelect);
+
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
       <TitleBar handleSelectOperation={handleSelectOperation} />
@@ -59,17 +69,30 @@ export default function RollCall() {
         <FilterBar />
         {/* 操作列表 */}
         <div ref={operationListParent} className="flex items-center gap-3">
+          {/* 选择操作 */}
           {!isLockMode && (
             <>
-              <SelectOperations />
+              {/* 选择模式 */}
+              <Select defaultValue="manual">
+                <SelectTrigger className="w-24">
+                  <SelectValue placeholder="选择模式" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">手动</SelectItem>
+                  <SelectItem value="random">随机</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <ManualSelector />
               <Separator orientation="vertical" />
             </>
           )}
-          {/* 操作列表 */}
+
+          {/* 数据操作 */}
           <DataOperations />
         </div>
         {/* 数据列表 */}
-        <DataList />
+        <DataList onSelect={onSelect} />
       </div>
     </div>
   );

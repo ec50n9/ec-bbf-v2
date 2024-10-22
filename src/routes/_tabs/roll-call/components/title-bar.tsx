@@ -2,9 +2,7 @@ import Header from "@/components/share/header";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -25,11 +23,8 @@ export default function TitleBar(props: {
             <SelectValue placeholder="选择操作模式" />
           </SelectTrigger>
           <SelectContent>
-            <SelectGroup>
-              <SelectLabel>操作模式</SelectLabel>
-              <SelectItem value="normal">选择数据</SelectItem>
-              <SelectItem value="lock-mode">锁定操作</SelectItem>
-            </SelectGroup>
+            <SelectItem value="normal">数据优先</SelectItem>
+            <SelectItem value="lock-mode">操作优先</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -1,15 +1,14 @@
 import { cn } from "@/lib/utils";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import CommonItem from "../items/common-item";
-import {
-  useManualSelectorStore,
-  useStudentStore,
-} from "@/stores/student-store";
+import { useStudentStore } from "@/stores/student-store";
 import type { MixedData } from "@/services/types";
 import type { Constructor } from "@/components/share/ec-data-list/share";
 import { useEffect } from "react";
 
-export default function DataList() {
+export default function DataList(props: {
+  onSelect: (data: MixedData) => void;
+}) {
   /** 数据列表动画 */
   const [dataListParent, enableDataListAnimations] = useAutoAnimate();
   useEffect(() => {
@@ -21,11 +20,10 @@ export default function DataList() {
   const lockedOperation = useStudentStore((s) => s.lockedOperation());
   const supportOperationTypesSet = new Set(lockedOperation?.supportedTypes);
   const selectedDataSet = new Set(useStudentStore((s) => s.selectedDataList));
-  const onSelect = useManualSelectorStore((s) => s.onSelect);
 
   const handleOnClick = (data: MixedData) => {
     if (isLockMode) lockedOperation?.action?.(data);
-    else onSelect(data);
+    else props.onSelect(data);
   };
 
   return (
