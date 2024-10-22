@@ -24,6 +24,7 @@ import {
   useRandomSelectorStore,
 } from "./selectors/random-selector";
 import { cn } from "@/lib/utils";
+import EcCard from "@/components/share/ec-card";
 
 // Sample data
 const studentList: Student[] = [
@@ -48,17 +49,10 @@ export default function RollCall() {
     (s) => s.updateSelectedDataList,
   );
 
-  /** 选择列表动画 */
-  const [selectOperationsParent, enableSelectOperationsAnimations] =
-    useAutoAnimate();
-  /** 操作列表动画 */
-  const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
 
   useEffect(() => {
     updateAllDataList([...studentList, ...studentGroupList]);
     updateOperationConfigs(operationConfigs);
-    enableSelectOperationsAnimations(true);
-    enableOperationListAnimations(true);
   }, []);
 
   /** 操作模式切换 */
@@ -95,18 +89,10 @@ export default function RollCall() {
         {/* 搜索项 */}
         <FilterBar />
         {/* 操作列表 */}
-        <div
-          className="flex flex-wrap items-center gap-3"
-        >
+        <div className="flex flex-wrap items-center gap-3">
           {/* 选择操作 */}
           {!isLockMode && (
-            <div
-              ref={selectOperationsParent}
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-2xl",
-                "bg-card border border-border",
-              )}
-            >
+            <EcCard title="数据选择">
               {/* 选择模式 */}
               <Select
                 defaultValue="manual"
@@ -123,11 +109,14 @@ export default function RollCall() {
               </Select>
 
               <selector.component />
-            </div>
+            </EcCard>
           )}
 
           {/* 数据操作 */}
-          <div
+          <EcCard title="数据操作">
+            <DataOperations />
+          </EcCard>
+          {/* <div
             ref={operationListParent}
             className={cn(
               "flex items-center gap-3 p-3 rounded-2xl",
@@ -135,7 +124,7 @@ export default function RollCall() {
             )}
           >
             <DataOperations />
-          </div>
+          </div> */}
         </div>
         {/* 数据列表 */}
         <DataList onSelect={selector.onSelect} />

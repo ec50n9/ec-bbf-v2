@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import {
   Select,
   SelectTrigger,
@@ -8,16 +7,12 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import EcCard from "@/components/share/ec-card";
 
 /** 过滤栏 */
 export default function FilterBar() {
   return (
-    <div
-      className={cn(
-        "flex items-center gap-4 p-3 rounded-2xl",
-        "bg-card border border-border",
-      )}
-    >
+    <EcCard title="筛选">
       <Select defaultValue="all">
         <SelectTrigger className="w-28">
           <SelectValue placeholder="选择数据类型" />
@@ -34,6 +29,6 @@ export default function FilterBar() {
       <Button size="sm" variant="default">
         筛选
       </Button>
-    </div>
+    </EcCard>
   );
 }
