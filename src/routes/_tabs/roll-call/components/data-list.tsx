@@ -7,11 +7,14 @@ import {
 } from "@/stores/student-store";
 import type { MixedData } from "@/services/types";
 import type { Constructor } from "@/components/share/ec-data-list/share";
+import { useEffect } from "react";
 
 export default function DataList() {
   /** 数据列表动画 */
   const [dataListParent, enableDataListAnimations] = useAutoAnimate();
-  enableDataListAnimations(true);
+  useEffect(() => {
+    enableDataListAnimations(false);
+  }, []);
 
   const dataList = useStudentStore((s) => s.allDataList);
   const isLockMode = useStudentStore((s) => s.isLockMode);

@@ -6,9 +6,8 @@ import SelectOperations from "./components/select-operations";
 import TitleBar from "./components/title-bar";
 import DataList from "./components/data-list";
 import { operationConfigs } from "./share";
-import { type MixedData, Student, StudentGroup } from "@/services/types";
+import { Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
-import { useManualSelectorStore } from "@/stores/student-store";
 import { useEffect } from "react";
 
 // Sample data
@@ -37,21 +36,20 @@ export default function RollCall() {
     (s) => s.updateOperationConfigs,
   );
 
+  /** 操作列表动画 */
+  const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
+
   useEffect(() => {
     updateAllDataList([...studentList, ...studentGroupList]);
     updateOperationConfigs(operationConfigs);
+    enableOperationListAnimations(true);
   }, []);
 
   /** 操作模式切换 */
   const handleSelectOperation = (val: string) => {
     updateLockedOperation(null);
-    updateSelectedDataList([]);
     updateIsLockMode(val === "lock-mode");
   };
-
-  /** 操作列表动画 */
-  const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
-  enableOperationListAnimations(true);
 
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
