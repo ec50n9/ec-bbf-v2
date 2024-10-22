@@ -85,7 +85,7 @@ export const ManualSelector = () => {
   return (
     <>
       {/* 单/多选 */}
-      <div className="flex items-center space-x-2">
+      <div className="shrink-0 flex items-center space-x-2">
         <Switch
           id="is-multi-select"
           checked={isMultiSelect}
@@ -98,6 +98,7 @@ export const ManualSelector = () => {
           {/* 清空选择 */}
           {!!selectedDataList.length && (
             <Button
+              className="shrink-0"
               size="sm"
               variant="outline"
               onClick={() => {
@@ -108,11 +109,21 @@ export const ManualSelector = () => {
             </Button>
           )}
           {/* 全(不)选 */}
-          <Button size="sm" variant="outline" onClick={toggleAllSelect}>
+          <Button
+            className="shrink-0"
+            size="sm"
+            variant="outline"
+            onClick={toggleAllSelect}
+          >
             {isAllSelected ? "全不选" : "全选"}
           </Button>
           {/* 反选 */}
-          <Button size="sm" variant="outline" onClick={reverseSelect}>
+          <Button
+            className="shrink-0"
+            size="sm"
+            variant="outline"
+            onClick={reverseSelect}
+          >
             反选
           </Button>
         </>

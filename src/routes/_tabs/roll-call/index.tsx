@@ -23,6 +23,7 @@ import {
   RandomSelector,
   useRandomSelectorStore,
 } from "./selectors/random-selector";
+import { cn } from "@/lib/utils";
 
 // Sample data
 const studentList: Student[] = [
@@ -47,12 +48,16 @@ export default function RollCall() {
     (s) => s.updateSelectedDataList,
   );
 
+  /** 选择列表动画 */
+  const [selectOperationsParent, enableSelectOperationsAnimations] =
+    useAutoAnimate();
   /** 操作列表动画 */
   const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
 
   useEffect(() => {
     updateAllDataList([...studentList, ...studentGroupList]);
     updateOperationConfigs(operationConfigs);
+    enableSelectOperationsAnimations(true);
     enableOperationListAnimations(true);
   }, []);
 
@@ -90,17 +95,25 @@ export default function RollCall() {
         {/* 搜索项 */}
         <FilterBar />
         {/* 操作列表 */}
-        <div ref={operationListParent} className="flex items-center gap-3">
+        <div
+          className="flex flex-wrap items-center gap-3"
+        >
           {/* 选择操作 */}
           {!isLockMode && (
-            <>
+            <div
+              ref={selectOperationsParent}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-2xl",
+                "bg-card border border-border",
+              )}
+            >
               {/* 选择模式 */}
               <Select
                 defaultValue="manual"
                 value={selectMode}
                 onValueChange={setSelectMode}
               >
-                <SelectTrigger className="w-24">
+                <SelectTrigger className="shrink-0 w-24">
                   <SelectValue placeholder="选择模式" />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,12 +123,19 @@ export default function RollCall() {
               </Select>
 
               <selector.component />
-              <Separator orientation="vertical" />
-            </>
+            </div>
           )}
 
           {/* 数据操作 */}
-          <DataOperations />
+          <div
+            ref={operationListParent}
+            className={cn(
+              "flex items-center gap-3 p-3 rounded-2xl",
+              "bg-card border border-border",
+            )}
+          >
+            <DataOperations />
+          </div>
         </div>
         {/* 数据列表 */}
         <DataList onSelect={selector.onSelect} />
