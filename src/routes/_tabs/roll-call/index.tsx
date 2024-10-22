@@ -7,7 +7,7 @@ import DataList from "./components/data-list";
 import { operationConfigs } from "./share";
 import { Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -19,6 +19,10 @@ import {
   ManualSelector,
   useManualSelectorStore,
 } from "./selectors/manual-selector";
+import {
+  RandomSelector,
+  useRandomSelectorStore,
+} from "./selectors/random-selector";
 
 // Sample data
 const studentList: Student[] = [
@@ -36,11 +40,11 @@ export default function RollCall() {
   const updateAllDataList = useStudentStore((s) => s.updateAllDataList);
   const isLockMode = useStudentStore((s) => s.isLockMode);
   const updateIsLockMode = useStudentStore((s) => s.updateIsLockMode);
-  const updateLockedOperation = useStudentStore(
-    (s) => s.updateLockedOperationKey,
-  );
   const updateOperationConfigs = useStudentStore(
     (s) => s.updateOperationConfigs,
+  );
+  const updateSelectedDataList = useStudentStore(
+    (s) => s.updateSelectedDataList,
   );
 
   /** 操作列表动画 */
@@ -54,12 +58,30 @@ export default function RollCall() {
 
   /** 操作模式切换 */
   const handleSelectOperation = (val: string) => {
-    updateLockedOperation(null);
     updateIsLockMode(val === "lock-mode");
   };
 
   /** 选择器 */
-  const onSelect = useManualSelectorStore((s) => s.onSelect);
+  const [selectMode, setSelectMode] = useState<string>("manual");
+  useEffect(() => {
+    updateSelectedDataList([]);
+  }, [selectMode, updateSelectedDataList]);
+  const selector = useMemo(() => {
+    if (selectMode === "manual")
+      return {
+        component: ManualSelector,
+        onSelect: useManualSelectorStore.getState().onSelect,
+      };
+    if (selectMode === "random")
+      return {
+        component: RandomSelector,
+        onSelect: useRandomSelectorStore.getState().onSelect,
+      };
+    return {
+      component: () => <div>未知选择模式</div>,
+      onSelect: () => {},
+    };
+  }, [selectMode]);
 
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
@@ -73,7 +95,11 @@ export default function RollCall() {
           {!isLockMode && (
             <>
               {/* 选择模式 */}
-              <Select defaultValue="manual">
+              <Select
+                defaultValue="manual"
+                value={selectMode}
+                onValueChange={setSelectMode}
+              >
                 <SelectTrigger className="w-24">
                   <SelectValue placeholder="选择模式" />
                 </SelectTrigger>
@@ -83,7 +109,7 @@ export default function RollCall() {
                 </SelectContent>
               </Select>
 
-              <ManualSelector />
+              <selector.component />
               <Separator orientation="vertical" />
             </>
           )}
@@ -92,7 +118,7 @@ export default function RollCall() {
           <DataOperations />
         </div>
         {/* 数据列表 */}
-        <DataList onSelect={onSelect} />
+        <DataList onSelect={selector.onSelect} />
       </div>
     </div>
   );

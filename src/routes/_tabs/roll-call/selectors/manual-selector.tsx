@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import type { MixedData } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
-import { Label } from "@radix-ui/react-dropdown-menu";
 import { create } from "zustand";
 
 type ManualSelectorState = {
@@ -69,7 +69,6 @@ export const useManualSelectorStore = create<ManualSelectorState>(
 
 /** 选择操作 */
 export const ManualSelector = () => {
-  const isLockMode = useStudentStore((s) => s.isLockMode);
   const isAllSelected = useStudentStore((s) => s.isAllSelected());
   const selectedDataList = useStudentStore((s) => s.selectedDataList);
   const updateSelectedDataList = useStudentStore(
@@ -88,12 +87,11 @@ export const ManualSelector = () => {
       {/* 单/多选 */}
       <div className="flex items-center space-x-2">
         <Switch
-          id="airplane-mode"
+          id="is-multi-select"
           checked={isMultiSelect}
           onCheckedChange={updateIsMultiSelect}
-          disabled={isLockMode}
         />
-        <Label htmlFor="airplane-mode">多选</Label>
+        <Label htmlFor="is-multi-select">多选</Label>
       </div>
       {isMultiSelect && (
         <>
