@@ -3,7 +3,6 @@ import DataOperations from "./components/data-operations";
 import TitleBar from "./components/title-bar";
 import DataList from "./components/data-list";
 import { operationConfigs } from "./share";
-import { type MixedData, Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -22,29 +21,22 @@ import {
   useRandomSelectorStore,
 } from "./selectors/random-selector";
 import EcCard from "@/components/share/ec-card";
-import { DbProvider } from "./providers/db-provider";
-import { OnlineProvider } from "./providers/online-provider";
-
-// Sample data
-const studentList: Student[] = [
-  new Student("1", "吴山茶", "11", 1, 1),
-  new Student("2", "孙菖蒲", "22", 1, 1),
-  new Student("3", "冯桃花", "33", 1, 1),
-];
-
-const studentGroupList: StudentGroup[] = [
-  new StudentGroup("11", "茉莉", 1, [1, 2]),
-  new StudentGroup("12", "香菊", 1, [2, 3]),
-];
+import { DbProvider, useDbProviderStore } from "./providers/db-provider";
+import {
+  OnlineProvider,
+  useOnlineProviderStore,
+} from "./providers/online-provider";
 
 const dataProviders = {
   db: {
     name: "数据库",
     component: DbProvider,
+    initData: useDbProviderStore.getState().initData,
   },
   online: {
     name: "在线",
     component: OnlineProvider,
+    initData: useOnlineProviderStore.getState().initData,
   },
 };
 
@@ -62,7 +54,6 @@ const dataSelectors = {
 };
 
 export default function RollCall() {
-  const updateAllDataList = useStudentStore((s) => s.updateAllDataList);
   const isLockMode = useStudentStore((s) => s.isLockMode);
   const updateIsLockMode = useStudentStore((s) => s.updateIsLockMode);
   const updateOperationConfigs = useStudentStore(
@@ -73,7 +64,7 @@ export default function RollCall() {
   );
 
   useEffect(() => {
-    updateAllDataList([...studentList, ...studentGroupList]);
+    dataProvider.initData();
     updateOperationConfigs(operationConfigs);
   }, []);
 

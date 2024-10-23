@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import ErrorPage from "@/components/share/error-page";
 import { insertClass, getAllClasses } from "@/services/class";
-import { useDatabase } from "@/hooks/useDatabaseHook";
+import { useDatabase } from "@/providers/database-provider";
 
 export default function StudentList() {
   const { db } = useDatabase();

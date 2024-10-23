@@ -1,7 +1,7 @@
 import type { IconType } from "react-icons/lib";
 
 export type BaseDataType = {
-  id: string;
+  id: number;
   name: string;
 };
 

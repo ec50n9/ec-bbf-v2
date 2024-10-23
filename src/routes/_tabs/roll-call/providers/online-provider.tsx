@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { create } from "zustand";
 
-type OnlineProviderState = {};
+type OnlineProviderState = {
+  initData: () => void;
+};
 
 export const useOnlineProviderStore = create<OnlineProviderState>(
-  (set, get) => ({}),
+  (set, get) => ({
+    initData: () => {},
+  }),
 );
 
 export const OnlineProvider = () => {

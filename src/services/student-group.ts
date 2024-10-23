@@ -1,11 +1,11 @@
-import type Database from "@tauri-apps/plugin-sql";
-import type { StudentGroup } from "./types";
+import { getDatabase } from "./database";
+import { StudentGroup } from "./types";
 
 // 插入学生分组记录
 export const insertStudentGroup = async (
-  db: Database,
   studentGroup: Omit<StudentGroup, "id">,
 ) => {
+  const db = await getDatabase();
   const res = await db.execute(
     "INSERT INTO student_group (name, subject_id) VALUES (?, ?)",
     [studentGroup.name, studentGroup.subjectId],
@@ -14,19 +14,15 @@ export const insertStudentGroup = async (
 };
 
 // 删除学生分组记录
-export const deleteStudentGroup = async (
-  db: Database,
-  id: StudentGroup["id"],
-) => {
+export const deleteStudentGroup = async (id: StudentGroup["id"]) => {
+  const db = await getDatabase();
   const res = await db.execute("DELETE FROM student_group WHERE id = ?", [id]);
   return res;
 };
 
 // 更新学生分组记录
-export const updateStudentGroup = async (
-  db: Database,
-  studentGroup: StudentGroup,
-) => {
+export const updateStudentGroup = async (studentGroup: StudentGroup) => {
+  const db = await getDatabase();
   const res = await db.execute(
     "UPDATE student_group SET name = ?, subject_id = ? WHERE id = ?",
     [studentGroup.name, studentGroup.subjectId, studentGroup.id],
@@ -35,9 +31,17 @@ export const updateStudentGroup = async (
 };
 
 // 查询学生分组记录
-export const getStudentGroup = async (db: Database, id: StudentGroup["id"]) => {
+export const getStudentGroup = async (id: StudentGroup["id"]) => {
+  const db = await getDatabase();
   const res = await db.execute("SELECT * FROM student_group WHERE id = ?", [
     id,
   ]);
   return res;
+};
+
+// 获取全部学生分组记录
+export const getAllStudentGroups = async () => {
+  const db = await getDatabase();
+  const res = await db.select<StudentGroup[]>("SELECT * FROM student_group");
+  return res.map((v) => StudentGroup.fromJSON(v));
 };
