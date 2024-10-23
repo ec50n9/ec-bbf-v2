@@ -23,7 +23,6 @@ import {
   RandomSelector,
   useRandomSelectorStore,
 } from "./selectors/random-selector";
-import { cn } from "@/lib/utils";
 import EcCard from "@/components/share/ec-card";
 
 // Sample data
@@ -48,7 +47,6 @@ export default function RollCall() {
   const updateSelectedDataList = useStudentStore(
     (s) => s.updateSelectedDataList,
   );
-
 
   useEffect(() => {
     updateAllDataList([...studentList, ...studentGroupList]);
@@ -82,6 +80,12 @@ export default function RollCall() {
     };
   }, [selectMode]);
 
+  /** 操作栏动画 */
+  const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
+  useEffect(() => {
+    enableOperationListAnimations(true);
+  }, []);
+
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
       <TitleBar handleSelectOperation={handleSelectOperation} />
@@ -89,7 +93,10 @@ export default function RollCall() {
         {/* 搜索项 */}
         <FilterBar />
         {/* 操作列表 */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div
+          ref={operationListParent}
+          className="flex flex-wrap items-center gap-3"
+        >
           {/* 选择操作 */}
           {!isLockMode && (
             <EcCard title="数据选择">
@@ -116,15 +123,6 @@ export default function RollCall() {
           <EcCard title="数据操作">
             <DataOperations />
           </EcCard>
-          {/* <div
-            ref={operationListParent}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-2xl",
-              "bg-card border border-border",
-            )}
-          >
-            <DataOperations />
-          </div> */}
         </div>
         {/* 数据列表 */}
         <DataList onSelect={selector.onSelect} />
