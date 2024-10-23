@@ -32,7 +32,7 @@ export default function DataOperations() {
   return (
     <>
       {isLockMode && !lockedOperationKey && (
-        <div className="flex items-center gap-3">请先选择一个操作 👉</div>
+        <div className="shrink-0 flex items-center gap-3">请先选择一个操作 👉</div>
       )}
       {supportedActions.map((action) => {
         const isLocked = lockedOperationKey === action.key;

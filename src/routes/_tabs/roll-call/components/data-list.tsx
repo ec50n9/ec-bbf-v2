@@ -12,7 +12,7 @@ export default function DataList(props: {
   /** 数据列表动画 */
   const [dataListParent, enableDataListAnimations] = useAutoAnimate();
   useEffect(() => {
-    enableDataListAnimations(false);
+    enableDataListAnimations(true);
   }, []);
 
   const dataList = useStudentStore((s) => s.allDataList);
