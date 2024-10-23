@@ -49,6 +49,6 @@ export const getSubject = async (id: Subject["id"]) => {
 // 获取全部班级记录
 export const getAllSubjects = async () => {
   const db = await getDatabase();
-  const res = await db.select<Subject[]>("SELECT * FROM class");
+  const res = await db.select<Subject[]>("SELECT * FROM subject");
   return res.map((v) => Subject.fromJSON(v));
 };
