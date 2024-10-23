@@ -2,17 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import EcCard from "@/components/share/ec-card";
+import { create } from "zustand";
 
-/** 过滤栏 */
-export default function FilterBar() {
+type DbProviderState = {};
+
+export const useDbProviderStore = create<DbProviderState>((set, get) => ({}));
+
+export const DbProvider = () => {
   return (
-    <EcCard title="筛选">
+    <>
       <Select defaultValue="all">
         <SelectTrigger className="w-28">
           <SelectValue placeholder="选择数据类型" />
@@ -29,6 +32,6 @@ export default function FilterBar() {
       <Button size="sm" variant="default">
         筛选
       </Button>
-    </EcCard>
+    </>
   );
-}
+};

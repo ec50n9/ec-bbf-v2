@@ -1,11 +1,9 @@
-import { Separator } from "@/components/ui/separator";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import DataOperations from "./components/data-operations";
-import FilterBar from "./components/filter-bar";
 import TitleBar from "./components/title-bar";
 import DataList from "./components/data-list";
 import { operationConfigs } from "./share";
-import { Student, StudentGroup } from "@/services/types";
+import { type MixedData, Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -24,6 +22,8 @@ import {
   useRandomSelectorStore,
 } from "./selectors/random-selector";
 import EcCard from "@/components/share/ec-card";
+import { DbProvider } from "./providers/db-provider";
+import { OnlineProvider } from "./providers/online-provider";
 
 // Sample data
 const studentList: Student[] = [
@@ -36,6 +36,30 @@ const studentGroupList: StudentGroup[] = [
   new StudentGroup("11", "茉莉", 1, [1, 2]),
   new StudentGroup("12", "香菊", 1, [2, 3]),
 ];
+
+const dataProviders = {
+  db: {
+    name: "数据库",
+    component: DbProvider,
+  },
+  online: {
+    name: "在线",
+    component: OnlineProvider,
+  },
+};
+
+const dataSelectors = {
+  manual: {
+    name: "手动",
+    component: ManualSelector,
+    onSelect: useManualSelectorStore.getState().onSelect,
+  },
+  random: {
+    name: "随机",
+    component: RandomSelector,
+    onSelect: useRandomSelectorStore.getState().onSelect,
+  },
+};
 
 export default function RollCall() {
   const updateAllDataList = useStudentStore((s) => s.updateAllDataList);
@@ -58,40 +82,60 @@ export default function RollCall() {
     updateIsLockMode(val === "lock-mode");
   };
 
-  /** 选择器 */
-  const [selectMode, setSelectMode] = useState<string>("manual");
-  useEffect(() => {
-    updateSelectedDataList([]);
-  }, [selectMode, updateSelectedDataList]);
-  const selector = useMemo(() => {
-    if (selectMode === "manual")
-      return {
-        component: ManualSelector,
-        onSelect: useManualSelectorStore.getState().onSelect,
-      };
-    if (selectMode === "random")
-      return {
-        component: RandomSelector,
-        onSelect: useRandomSelectorStore.getState().onSelect,
-      };
-    return {
-      component: () => <div>未知选择模式</div>,
-      onSelect: () => {},
-    };
-  }, [selectMode]);
-
   /** 操作栏动画 */
   const [operationListParent, enableOperationListAnimations] = useAutoAnimate();
   useEffect(() => {
     enableOperationListAnimations(true);
   }, []);
 
+  // #region 数据提供器
+  const [providerType, setProviderType] =
+    useState<keyof typeof dataProviders>("db");
+  const dataProvider = useMemo(() => {
+    return dataProviders[providerType];
+  }, [providerType]);
+  // #endregion
+
+  // #region 选择模式
+  const [selectMode, setSelectMode] =
+    useState<keyof typeof dataSelectors>("manual");
+  const selector = useMemo(() => {
+    return dataSelectors[selectMode];
+  }, [selectMode]);
+
+  // 切换选择模式时清空选择列表
+  useEffect(() => {
+    updateSelectedDataList([]);
+  }, [selectMode, updateSelectedDataList]);
+  // #endregion
+
   return (
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
       <TitleBar handleSelectOperation={handleSelectOperation} />
       <div className="mt-3 flex flex-col gap-3">
         {/* 搜索项 */}
-        <FilterBar />
+        <EcCard title="筛选">
+          {/* 选择模式 */}
+          <Select
+            defaultValue="db"
+            value={providerType}
+            onValueChange={setProviderType}
+          >
+            <SelectTrigger className="shrink-0 w-24">
+              <SelectValue placeholder="数据来源" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(dataProviders).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {dataProviders[key].name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <dataProvider.component />
+        </EcCard>
+
         {/* 操作列表 */}
         <div
           ref={operationListParent}
@@ -110,8 +154,11 @@ export default function RollCall() {
                   <SelectValue placeholder="选择模式" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="manual">手动</SelectItem>
-                  <SelectItem value="random">随机</SelectItem>
+                  {Object.keys(dataSelectors).map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {dataSelectors[key].name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
