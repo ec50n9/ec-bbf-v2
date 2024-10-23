@@ -51,7 +51,7 @@ export default function DataList(props: {
                 "outline outline-0 outline-offset-2 outline-ring",
                 !isLockMode &&
                   selectedDataSet.has(item) &&
-                  "scale-90 outline-4",
+                  "scale-90 outline-4 z-10",
               )}
             >
               <CommonItem

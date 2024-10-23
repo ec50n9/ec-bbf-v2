@@ -1,4 +1,4 @@
-import type { Student } from "../share";
+import type { Student } from "@/services/types";
 
 interface StudentItemProps {
   data: Student;
