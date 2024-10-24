@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  deleteStudent,
   getAllStudents,
   insertStudent,
   type InsertStudentParams,
@@ -36,10 +37,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { create } from "zustand";
 import { useGlobalStore } from "@/stores/global-store";
 import { useState } from "react";
+import { LuTrash } from "react-icons/lu";
+import { Student, StudentGroup } from "@/services/types";
 
 type DbProviderState = {
   initData: () => Promise<void>;
   addStudent: (student: InsertStudentParams) => Promise<number>;
+  delStudent: (id: number) => Promise<void>;
 };
 
 export const useDbProviderStore = create<DbProviderState>((set, get) => ({
@@ -54,7 +58,28 @@ export const useDbProviderStore = create<DbProviderState>((set, get) => ({
     await get().initData();
     return res.lastInsertId;
   },
+  delStudent: async (id: number) => {
+    await deleteStudent(id);
+    await get().initData();
+  },
 }));
+
+export const dbProviderActions = [
+  {
+    key: "delete",
+    label: "删除",
+    icon: LuTrash,
+    supportedTypes: [Student, StudentGroup],
+    action: (data: Student | StudentGroup) => {
+      console.log(`Deleting ${data.name}`);
+      if (data instanceof Student) {
+        useDbProviderStore.getState().delStudent(data.id);
+      } else {
+        console.log("删除分组");
+      }
+    },
+  },
+];
 
 export const DbProvider = () => {
   const [dialogOpen, setDialogOpen] = useState(false);

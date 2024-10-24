@@ -1,17 +1,8 @@
-import { LuPlus, LuMinus, LuTrash } from "react-icons/lu";
+import { LuPlus, LuMinus } from "react-icons/lu";
 import type { OperationConfig } from "@/components/share/ec-data-list";
-import { type MixedData, Student, StudentGroup } from "@/services/types";
+import { type MixedData, Student } from "@/services/types";
 
 export const operationConfigs: OperationConfig<MixedData>[] = [
-  {
-    key: "delete",
-    label: "删除",
-    icon: LuTrash,
-    supportedTypes: [Student, StudentGroup],
-    action: (data) => {
-      console.log(`Deleting ${data.name}`);
-    },
-  },
   {
     key: "addScore",
     label: "加分",

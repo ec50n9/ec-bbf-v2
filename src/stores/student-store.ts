@@ -53,7 +53,16 @@ export const useStudentStore = create<State & Getter & Action>((set, get) => ({
   operationConfigs: [],
   isLockMode: false,
   lockedOperationKey: null,
-  updateAllDataList: (data) => set({ allDataList: data }),
+  updateAllDataList: (data) =>
+    set((state) => {
+      const allDataSet = new Set(data);
+      return {
+        allDataList: data,
+        selectedDataList: state.selectedDataList.filter((i) =>
+          allDataSet.has(i),
+        ),
+      };
+    }),
   updateSelectedDataList: (data) => set({ selectedDataList: data }),
   updateOperationConfigs: (configs) => set({ operationConfigs: configs }),
   updateIsLockMode: (isLockMode) => set({ isLockMode }),

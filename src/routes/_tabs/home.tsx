@@ -1,7 +1,6 @@
 import { LuBellRing, LuSettings } from "react-icons/lu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { openModalWindow } from "@/utils/modal-manager";
 
 export default function Home() {
   return (
@@ -20,17 +19,6 @@ export default function Home() {
 }
 
 function UserInfoPanel(props: { className?: string }) {
-  const newWindow = () => {
-    openModalWindow({
-      title: "新窗口",
-      url: "https://github.com/tauri-apps/tauri",
-      width: 600,
-      height: 400,
-      center: true,
-      resizable: false,
-    });
-  };
-
   return (
     <div
       className={cn(
@@ -50,7 +38,7 @@ function UserInfoPanel(props: { className?: string }) {
         <LuSettings className="size-5" />
       </div>
 
-      <div className="mt-4 bg-white px-3 py-3 rounded-full" onClick={newWindow}>
+      <div className="mt-4 bg-white px-3 py-3 rounded-full">
         <LuSettings />
       </div>
     </div>

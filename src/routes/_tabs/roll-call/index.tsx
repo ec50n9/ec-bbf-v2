@@ -21,7 +21,11 @@ import {
   useRandomSelectorStore,
 } from "./selectors/random-selector";
 import EcCard from "@/components/share/ec-card";
-import { DbProvider, useDbProviderStore } from "./providers/db-provider";
+import {
+  DbProvider,
+  dbProviderActions,
+  useDbProviderStore,
+} from "./providers/db-provider";
 
 const dataProviders = {
   db: {
@@ -56,7 +60,7 @@ export default function RollCall() {
 
   useEffect(() => {
     dataProvider.initData();
-    updateOperationConfigs(operationConfigs);
+    updateOperationConfigs([...dbProviderActions, ...operationConfigs]);
   }, []);
 
   /** 操作模式切换 */
