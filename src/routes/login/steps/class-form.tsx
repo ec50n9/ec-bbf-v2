@@ -19,9 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import ActionButton from "@/components/login/action-button";
+import ActionButton from "../components/action-button";
 import { useForm } from "react-hook-form";
-import type { StepFormProps } from "./share";
+import type { StepFormProps } from "../share";
+import { useLoginStore } from "../store";
 
 /** 年级分组 */
 const gradeGroups = [
@@ -60,7 +61,7 @@ const classFormSchema = z.object({
     .min(1, "班级名称不能为空")
     .max(10, "班级名称不能超过 10 个字符"),
   grade: z.string().min(1, "请选择所在年级"),
-  class: z.string().max(10, "长度不能大于 10").optional(),
+  clazz: z.string().max(10, "长度不能大于 10").optional(),
 });
 
 export default function ClassForm(props: StepFormProps) {
@@ -69,12 +70,17 @@ export default function ClassForm(props: StepFormProps) {
     defaultValues: {
       name: "",
       grade: "",
-      class: "",
+      clazz: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof classFormSchema>) {
-    console.log("on submit", values);
+  async function onSubmit(values: z.infer<typeof classFormSchema>) {
+    const createClass = useLoginStore.getState().createClass;
+    await createClass({
+      clazzName: values.name,
+      grade: values.grade,
+      clazz: values.clazz,
+    });
     props.onSuccess?.();
   }
 
@@ -134,7 +140,7 @@ export default function ClassForm(props: StepFormProps) {
           />
           <FormField
             control={form.control}
-            name="class"
+            name="clazz"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>班别</FormLabel>

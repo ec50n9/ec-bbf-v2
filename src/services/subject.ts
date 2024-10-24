@@ -4,11 +4,11 @@ export class Subject {
   constructor(
     public id: number,
     public name: string,
-    public class_id: number,
+    public clazzId: number,
   ) {}
 
-  static fromJSON(data: { id: number; name: string; class_id: number }) {
-    return new Subject(data.id, data.name, data.class_id);
+  static fromJSON(data: { id: number; name: string; clazzId: number }) {
+    return new Subject(data.id, data.name, data.clazzId);
   }
 }
 
@@ -17,7 +17,7 @@ export const insertSubject = async (subject: Omit<Subject, "id">) => {
   const db = await getDatabase();
   const res = await db.execute(
     "INSERT INTO subject (name, class_id) VALUES (?, ?)",
-    [subject.name, subject.class_id],
+    [subject.name, subject.clazzId],
   );
   return res;
 };
@@ -34,7 +34,7 @@ export const updateSubject = async (subject: Subject) => {
   const db = await getDatabase();
   const res = await db.execute(
     "UPDATE subject SET name = ?, class_id = ? WHERE id = ?",
-    [subject.name, subject.class_id, subject.id],
+    [subject.name, subject.clazzId, subject.id],
   );
   return res;
 };
@@ -42,7 +42,9 @@ export const updateSubject = async (subject: Subject) => {
 // 查询科目记录
 export const getSubject = async (id: Subject["id"]) => {
   const db = await getDatabase();
-  const res = await db.execute("SELECT * FROM subject WHERE id = ?", [id]);
+  const res = await db.select<Subject[]>("SELECT * FROM subject WHERE id = ?", [
+    id,
+  ]);
   return res;
 };
 

@@ -8,7 +8,7 @@ export const insertStudent = async (student: InsertStudentParams) => {
   const db = await getDatabase();
   const res = await db.execute(
     "INSERT INTO student (name, stu_no, class_id, subject_id) VALUES (?, ?, ?, ?)",
-    [student.name, student.stuNo, student.classId, student.subjectId],
+    [student.name, student.stuNo, student.clazzId, student.subjectId],
   );
   return res;
 };
@@ -28,7 +28,7 @@ export const updateStudent = async (student: Student) => {
     [
       student.name,
       student.stuNo,
-      student.classId,
+      student.clazzId,
       student.subjectId,
       student.id,
     ],

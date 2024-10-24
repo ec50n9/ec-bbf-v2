@@ -19,18 +19,39 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons/lib";
 import { ThemeModeToggle } from "@/components/share/theme-mode-toggle";
+import { getAllClasses, getClass } from "@/services/class";
+import { getAllSubjects } from "@/services/subject";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { useGlobalStore } from "@/stores/global-store";
 
 export default function Root() {
-  const navigate = useNavigate();
+  const checkClassAndSubject = async () => {
+    const allClasses = await getAllClasses();
+    const allSubjects = await getAllSubjects();
 
-  const gotoLogin = useCallback(() => {
-    navigate("/login", { replace: true });
-  }, [navigate]);
+    if (allClasses.length > 0 && allSubjects.length > 0) {
+      useGlobalStore.getState().updateIsolationCondition({
+        clazz: allClasses[0],
+        subject: allSubjects[0],
+      });
+
+      return;
+    }
+
+    const webview = new WebviewWindow("login", {
+      url: "/login",
+      title: "初次见面",
+      width: 700,
+      height: 700,
+      center: true,
+      resizable: true,
+      alwaysOnTop: true,
+    });
+  };
 
   useEffect(() => {
-    // TODO: 检查登录状态
-    // gotoLogin();
-  }, [gotoLogin]);
+    checkClassAndSubject();
+  }, []);
 
   return (
     <div className="h-screen grid grid-cols-[auto_1fr] gap-8 bg-background text-foreground overflow-hidden">

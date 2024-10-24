@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { LuSchool2, LuBookPlus, LuBadgeCheck } from "react-icons/lu";
 import Header from "@/components/share/header";
-import Step from "@/components/login/step";
-import ClassForm from "@/components/login/class-form";
-import SubjectForm from "@/components/login/subject-form";
-import EverythingReady from "@/components/login/everything-ready";
+import Step from "./components/step";
+import ClassForm from "./steps/class-form";
+import SubjectForm from "./steps/subject-form";
+import EverythingReady from "./steps/everything-ready";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";

@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,20 +24,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type Clazz, getAllClasses } from "@/services/class";
 import {
   getAllStudents,
   insertStudent,
   type InsertStudentParams,
 } from "@/services/student";
-import { getAllSubjects, type Subject } from "@/services/subject";
-import type { Student } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { create } from "zustand";
+import { useGlobalStore } from "@/stores/global-store";
+import { useState } from "react";
 
 type DbProviderState = {
   initData: () => Promise<void>;
@@ -50,7 +47,6 @@ export const useDbProviderStore = create<DbProviderState>((set, get) => ({
     const updateAllDataList = useStudentStore.getState().updateAllDataList;
 
     const students = await getAllStudents();
-    console.log("students:", students);
     updateAllDataList(students);
   },
   addStudent: async (student: InsertStudentParams) => {
@@ -61,11 +57,18 @@ export const useDbProviderStore = create<DbProviderState>((set, get) => ({
 }));
 
 export const DbProvider = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const addStudent = useDbProviderStore((state) => state.addStudent);
 
-  const handleAddStudent = async (student: InsertStudentParams) => {
-    const res = await addStudent(student);
-    console.log("insert student res", res);
+  const handleAddStudent = async (
+    student: Pick<InsertStudentParams, "name" | "stuNo">,
+  ) => {
+    const clazzId = useGlobalStore.getState().clazz!.id;
+    const subjectId = useGlobalStore.getState().subject!.id;
+    await addStudent({ ...student, clazzId, subjectId });
+
+    setDialogOpen(false);
   };
 
   return (
@@ -87,7 +90,7 @@ export const DbProvider = () => {
         搜索
       </Button>
 
-      <Dialog>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
             添加
@@ -112,41 +115,26 @@ export const DbProvider = () => {
 const studentFormSchema = z.object({
   stuNo: z.string().min(1, "学号不能为空").max(10, "学号不能超过 10 个字符"),
   name: z.string().min(1, "姓名不能为空").max(10, "姓名不能超过 10 个字符"),
-  classId: z.string().min(1, "请选择所在班级"),
-  subjectId: z.string().min(1, "请选择所在课程"),
 });
 
 const AddStudentForm = (props: {
-  onSubmit: (data: InsertStudentParams) => void;
+  onSubmit: (data: Pick<InsertStudentParams, "name" | "stuNo">) => void;
 }) => {
   const form = useForm<z.infer<typeof studentFormSchema>>({
     resolver: zodResolver(studentFormSchema),
     defaultValues: {
       stuNo: "",
       name: "",
-      classId: "",
-      subjectId: "",
     },
   });
-
-  const [clazzList, setClazzList] = useState<Clazz[]>([]);
-  const [subjectList, setSubjectList] = useState<Subject[]>([]);
-  useEffect(() => {
-    Promise.all([getAllClasses(), getAllSubjects()]).then(
-      ([_clazzList, _subjectList]) => {
-        setClazzList(_clazzList);
-        setSubjectList(_subjectList);
-      },
-    );
-  }, []);
 
   const handleOnSubmit = (data: z.infer<typeof studentFormSchema>) => {
     props.onSubmit({
       name: data.name,
       stuNo: data.stuNo,
-      classId: Number(data.classId),
-      subjectId: Number(data.subjectId),
     });
+
+    form.reset();
   };
 
   return (
@@ -179,56 +167,6 @@ const AddStudentForm = (props: {
                 <Input placeholder="输入姓名" {...field} />
               </FormControl>
               <FormDescription>输入学生的姓名</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="classId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>班级</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择班级" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent side="bottom" className="h-60">
-                  {clazzList.map((item) => (
-                    <SelectItem key={item.id} value={String(item.id)}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>选择班级</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="subjectId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>课程</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择科目" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent side="bottom" className="h-60">
-                  {subjectList.map((subject) => (
-                    <SelectItem key={subject.id} value={String(subject.id)}>
-                      {subject.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>选择科目</FormDescription>
               <FormMessage />
             </FormItem>
           )}

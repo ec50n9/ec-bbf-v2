@@ -11,7 +11,6 @@ import { useTheme } from "@/providers/theme-provider";
 
 export function ThemeModeToggle() {
   const { theme, setTheme } = useTheme();
-  console.log("theme:", theme);
 
   return (
     <DropdownMenu>

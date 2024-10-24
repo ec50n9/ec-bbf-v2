@@ -1,9 +1,7 @@
-import { getCurrentWindow, LogicalSize, Window } from "@tauri-apps/api/window";
 import { LuBellRing, LuSettings } from "react-icons/lu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Webview } from "@tauri-apps/api/webview";
-import { ModalManager } from "@/utils/modal-manager";
+import { openModalWindow } from "@/utils/modal-manager";
 
 export default function Home() {
   return (
@@ -23,7 +21,7 @@ export default function Home() {
 
 function UserInfoPanel(props: { className?: string }) {
   const newWindow = () => {
-    ModalManager.getInstance().openModal({
+    openModalWindow({
       title: "新窗口",
       url: "https://github.com/tauri-apps/tauri",
       width: 600,

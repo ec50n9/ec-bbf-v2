@@ -1,11 +1,9 @@
-import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import type { ModalOptions, ModalResult, ModalData } from "../types/modal";
 import {
   getAllWindows,
   getCurrentWindow,
   Window,
-  WindowOptions,
 } from "@tauri-apps/api/window";
 import { Webview } from "@tauri-apps/api/webview";
 
@@ -64,7 +62,7 @@ export class ModalManager {
     currentWindow.setEnabled(false);
 
     const { url, modalId, ...windowOptions } = options;
-    const appWindow = new Window(`win-${modalId}`, windowOptions);
+    const appWindow = new Window(modalId, windowOptions);
     appWindow.onCloseRequested(() => {
       console.log("close-requested");
       currentWindow.setEnabled(true);
@@ -76,7 +74,7 @@ export class ModalManager {
       console.log("window error", e);
     });
 
-    const webview = new Webview(appWindow, `webview-${modalId}`, {
+    const webview = new Webview(appWindow, modalId, {
       url: `${url}?modalId=${modalId}`,
       x: 0,
       y: 0,
@@ -93,14 +91,14 @@ export class ModalManager {
 
   async #closeModalWindow(modalId: string) {
     const windows = await getAllWindows();
-    const window = windows.find((window) => window.label === `win-${modalId}`);
+    const window = windows.find((window) => window.label === modalId);
     window?.close();
   }
 
   public async openModal<T = unknown>(
     options: ModalOptions,
   ): Promise<ModalResult<T>> {
-    const modalId = options.modalId || `modal-${Date.now()}`;
+    const modalId = options.modalId;
     const finalOptions: ModalOptions = {
       title: "Modal Window",
       width: 600,
@@ -112,11 +110,6 @@ export class ModalManager {
     };
 
     try {
-      // 调用 Rust 创建窗口
-      // await invoke("create_modal_window", {
-      //   modalId,
-      //   options: finalOptions,
-      // });
       this.#createModalWindow(finalOptions);
 
       return new Promise<ModalResult<T>>((resolve, reject) => {
@@ -143,6 +136,7 @@ export class ModalManager {
     error?: string,
   ): Promise<void> {
     try {
+      console.log("active modals:", this.#activeModals);
       const modalData = this.#activeModals.get(modalId);
       if (!modalData) {
         throw new Error(`No active modal found with id: ${modalId}`);

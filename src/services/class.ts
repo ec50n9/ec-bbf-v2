@@ -48,7 +48,9 @@ export const updateClass = async (classData: Clazz) => {
 // 查询班级记录
 export const getClass = async (id: Clazz["id"]) => {
   const db = await getDatabase();
-  const res = await db.execute("SELECT * FROM class WHERE id = ?", [id]);
+  const res = await db.select<Clazz[]>("SELECT * FROM class WHERE id = ?", [
+    id,
+  ]);
   return res;
 };
 

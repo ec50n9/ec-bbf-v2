@@ -22,21 +22,12 @@ import {
 } from "./selectors/random-selector";
 import EcCard from "@/components/share/ec-card";
 import { DbProvider, useDbProviderStore } from "./providers/db-provider";
-import {
-  OnlineProvider,
-  useOnlineProviderStore,
-} from "./providers/online-provider";
 
 const dataProviders = {
   db: {
     name: "数据库",
     component: DbProvider,
     initData: useDbProviderStore.getState().initData,
-  },
-  online: {
-    name: "在线",
-    component: OnlineProvider,
-    initData: useOnlineProviderStore.getState().initData,
   },
 };
 
@@ -104,10 +95,15 @@ export default function RollCall() {
     <div className="h-full grid grid-rows-[auto_1fr] px-2">
       <TitleBar handleSelectOperation={handleSelectOperation} />
       <div className="mt-3 flex flex-col gap-3">
-        {/* 搜索项 */}
-        <EcCard title="筛选">
-          {/* 选择模式 */}
-          <Select
+        {/* 操作列表 */}
+        <div
+          ref={operationListParent}
+          className="flex flex-wrap items-center gap-3"
+        >
+          {/* 搜索项 */}
+          <EcCard title="筛选">
+            {/* 选择模式 */}
+            {/* <Select
             defaultValue="db"
             value={providerType}
             onValueChange={setProviderType}
@@ -122,16 +118,11 @@ export default function RollCall() {
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
 
-          <dataProvider.component />
-        </EcCard>
+            <dataProvider.component />
+          </EcCard>
 
-        {/* 操作列表 */}
-        <div
-          ref={operationListParent}
-          className="flex flex-wrap items-center gap-3"
-        >
           {/* 选择操作 */}
           {!isLockMode && (
             <EcCard title="数据选择">

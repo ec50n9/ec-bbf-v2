@@ -5,7 +5,7 @@ export class Student implements BaseDataType {
     public id: number,
     public name: string,
     public stuNo: string,
-    public classId: number,
+    public clazzId: number,
     public subjectId: number,
   ) {}
 

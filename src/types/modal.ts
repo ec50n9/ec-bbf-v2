@@ -2,7 +2,7 @@ import type { WindowOptions } from "@tauri-apps/api/window";
 
 export interface ModalOptions extends WindowOptions {
   url: string;
-  modalId?: string;
+  modalId: string;
 }
 
 export interface ModalResult<T = unknown> {
