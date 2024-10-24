@@ -1,6 +1,9 @@
+import { getCurrentWindow, LogicalSize, Window } from "@tauri-apps/api/window";
 import { LuBellRing, LuSettings } from "react-icons/lu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { Webview } from "@tauri-apps/api/webview";
+import { ModalManager } from "@/utils/modal-manager";
 
 export default function Home() {
   return (
@@ -19,6 +22,17 @@ export default function Home() {
 }
 
 function UserInfoPanel(props: { className?: string }) {
+  const newWindow = () => {
+    ModalManager.getInstance().openModal({
+      title: "新窗口",
+      url: "https://github.com/tauri-apps/tauri",
+      width: 600,
+      height: 400,
+      center: true,
+      resizable: false,
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -38,7 +52,7 @@ function UserInfoPanel(props: { className?: string }) {
         <LuSettings className="size-5" />
       </div>
 
-      <div className="mt-4 bg-white px-3 py-3 rounded-full">
+      <div className="mt-4 bg-white px-3 py-3 rounded-full" onClick={newWindow}>
         <LuSettings />
       </div>
     </div>
