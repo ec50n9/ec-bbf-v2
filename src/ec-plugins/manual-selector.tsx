@@ -1,74 +1,72 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import type { MixedData } from "@/services/types";
+import type { Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
+import type { EcPlugin } from "@/types/plugin";
 import { create } from "zustand";
 
 type ManualSelectorState = {
-  onSelect: (data: MixedData) => void;
+  onSelect: (data: Student | StudentGroup) => void;
   isMultiSelect: boolean;
   updateIsMultiSelect: (val: boolean) => void;
   toggleAllSelect: () => void;
   reverseSelect: () => void;
 };
 
-export const useManualSelectorStore = create<ManualSelectorState>(
-  (set, get) => ({
-    isMultiSelect: false,
+const useManualSelectorStore = create<ManualSelectorState>((set, get) => ({
+  isMultiSelect: false,
 
-    onSelect: (data: MixedData) => {
-      const selectedDataList = useStudentStore.getState().selectedDataList;
-      const updateSelectedDataList =
-        useStudentStore.getState().updateSelectedDataList;
+  onSelect: (data: Student | StudentGroup) => {
+    const selectedDataList = useStudentStore.getState().selectedDataList;
+    const updateSelectedDataList =
+      useStudentStore.getState().updateSelectedDataList;
 
-      // 多选模式
-      if (get().isMultiSelect) {
-        const newList = selectedDataList.includes(data)
-          ? selectedDataList.filter((item) => item !== data)
-          : [...selectedDataList, data];
-        useStudentStore.getState().updateSelectedDataList(newList);
-      }
-      // 单选模式
-      else {
-        if (data === selectedDataList[0]) updateSelectedDataList([]);
-        else updateSelectedDataList([data]);
-      }
-    },
+    // 多选模式
+    if (get().isMultiSelect) {
+      const newList = selectedDataList.includes(data)
+        ? selectedDataList.filter((item) => item !== data)
+        : [...selectedDataList, data];
+      useStudentStore.getState().updateSelectedDataList(newList);
+    }
+    // 单选模式
+    else {
+      if (data === selectedDataList[0]) updateSelectedDataList([]);
+      else updateSelectedDataList([data]);
+    }
+  },
 
-    /** 切换单选多选 */
-    updateIsMultiSelect: (val: boolean) => {
-      const { selectedDataList, updateSelectedDataList } =
-        useStudentStore.getState();
-      if (!val && selectedDataList.length) {
-        updateSelectedDataList([selectedDataList[0]]);
-      }
-      set({ isMultiSelect: val });
-    },
+  /** 切换单选多选 */
+  updateIsMultiSelect: (val: boolean) => {
+    const { selectedDataList, updateSelectedDataList } =
+      useStudentStore.getState();
+    if (!val && selectedDataList.length) {
+      updateSelectedDataList([selectedDataList[0]]);
+    }
+    set({ isMultiSelect: val });
+  },
 
-    /** 切换全选 */
-    toggleAllSelect: () => {
-      const { allDataList, updateSelectedDataList, isAllSelected } =
-        useStudentStore.getState();
+  /** 切换全选 */
+  toggleAllSelect: () => {
+    const { allDataList, updateSelectedDataList, isAllSelected } =
+      useStudentStore.getState();
 
-      if (isAllSelected()) updateSelectedDataList([]);
-      else updateSelectedDataList([...allDataList]);
-    },
+    if (isAllSelected()) updateSelectedDataList([]);
+    else updateSelectedDataList([...allDataList]);
+  },
 
-    /** 反选 */
-    reverseSelect: () => {
-      const { selectedDataList, updateSelectedDataList, allDataList } =
-        useStudentStore.getState();
+  /** 反选 */
+  reverseSelect: () => {
+    const { selectedDataList, updateSelectedDataList, allDataList } =
+      useStudentStore.getState();
 
-      updateSelectedDataList(
-        allDataList.filter((item) => !selectedDataList.includes(item)),
-      );
-    },
-  }),
-);
+    updateSelectedDataList(
+      allDataList.filter((item) => !selectedDataList.includes(item)),
+    );
+  },
+}));
 
-/** 选择操作 */
-export const ManualSelector = () => {
+const ManualSelector = () => {
   const isAllSelected = useStudentStore((s) => s.isAllSelected());
   const selectedDataList = useStudentStore((s) => s.selectedDataList);
   const updateSelectedDataList = useStudentStore(
@@ -131,3 +129,16 @@ export const ManualSelector = () => {
     </>
   );
 };
+
+const plugin: EcPlugin<Student | StudentGroup> = {
+  dataSelector: {
+    id: "selector-manual",
+    name: "手动",
+    component: ManualSelector,
+    onItemClick: (data: Student | StudentGroup) => {
+      useManualSelectorStore.getState().onSelect(data);
+    },
+  },
+};
+
+export default plugin;

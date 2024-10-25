@@ -2,7 +2,6 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import DataOperations from "./components/data-operations";
 import TitleBar from "./components/title-bar";
 import DataList from "./components/data-list";
-import { operationConfigs } from "./share";
 import { useStudentStore } from "@/stores/student-store";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -12,40 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ManualSelector,
-  useManualSelectorStore,
-} from "./selectors/manual-selector";
-import {
-  RandomSelector,
-  useRandomSelectorStore,
-} from "./selectors/random-selector";
 import EcCard from "@/components/share/ec-card";
-import {
-  DbProvider,
-  dbProviderActions,
-  useDbProviderStore,
-} from "./providers/db-provider";
+import type { EcDataProvider, EcDataSelector, EcPlugin } from "@/types/plugin";
+import type { MixedData } from "@/services/types";
 
-const dataProviders = {
-  db: {
-    name: "数据库",
-    component: DbProvider,
-    initData: useDbProviderStore.getState().initData,
-  },
-};
-
-const dataSelectors = {
-  manual: {
-    name: "手动",
-    component: ManualSelector,
-    onSelect: useManualSelectorStore.getState().onSelect,
-  },
-  random: {
-    name: "随机",
-    component: RandomSelector,
-    onSelect: useRandomSelectorStore.getState().onSelect,
-  },
+const loadPlugins = async () => {
+  const pluginFiles = import.meta.glob("@/ec-plugins/*.tsx");
+  const plugins: EcPlugin<any>[] = [];
+  for (const path in pluginFiles) {
+    const mod = await pluginFiles[path]();
+    plugins.push(mod.default);
+  }
+  return plugins;
 };
 
 export default function RollCall() {
@@ -58,10 +35,52 @@ export default function RollCall() {
     (s) => s.updateSelectedDataList,
   );
 
+  const [dataProviders, setDataProviders] = useState<EcDataProvider[]>([]);
+  const [dataSelectors, setDataSelectors] = useState<
+    EcDataSelector<MixedData>[]
+  >([]);
+
+  const [currentProviderId, setCurrentProviderId] =
+    useState<EcDataProvider["id"]>();
+  const [currentSelectorId, setCurrentSelectorId] =
+    useState<EcDataSelector<MixedData>["id"]>();
+
+  const currentProvider = useMemo(() => {
+    return dataProviders.find((provider) => provider.id === currentProviderId);
+  }, [currentProviderId, dataProviders]);
+
+  const currentSelector = useMemo(() => {
+    return dataSelectors.find((selector) => selector.id === currentSelectorId);
+  }, [currentSelectorId, dataSelectors]);
+
   useEffect(() => {
-    dataProvider.initData();
-    updateOperationConfigs([...dbProviderActions, ...operationConfigs]);
+    loadPlugins().then((plugins) => {
+      console.log("plugins:", plugins);
+
+      // 数据提供器
+      const providers = plugins
+        .filter((plugin) => plugin.dataProvider)
+        .map((plugin) => plugin.dataProvider as EcDataProvider);
+      setDataProviders(providers);
+      setCurrentProviderId(providers[0]?.id);
+
+      // 数据选择器
+      const selectors = plugins
+        .filter((plugin) => plugin.dataSelector)
+        .map((plugin) => plugin.dataSelector as EcDataSelector<MixedData>);
+      setDataSelectors(selectors);
+      setCurrentSelectorId(selectors[0]?.id);
+
+      // 操作
+      const actions = plugins.flatMap((plugin) => plugin.actions || []);
+      updateOperationConfigs([...actions]);
+    });
   }, []);
+
+  useEffect(() => {
+    // 数据提供器的初始化
+    currentProvider?.onInit?.();
+  }, [currentProvider]);
 
   /** 操作模式切换 */
   const handleSelectOperation = (val: string) => {
@@ -74,25 +93,10 @@ export default function RollCall() {
     enableOperationListAnimations(true);
   }, []);
 
-  // #region 数据提供器
-  const [providerType, setProviderType] =
-    useState<keyof typeof dataProviders>("db");
-  const dataProvider = useMemo(() => {
-    return dataProviders[providerType];
-  }, [providerType]);
-  // #endregion
-
-  // #region 选择模式
-  const [selectMode, setSelectMode] =
-    useState<keyof typeof dataSelectors>("manual");
-  const selector = useMemo(() => {
-    return dataSelectors[selectMode];
-  }, [selectMode]);
-
   // 切换选择模式时清空选择列表
   useEffect(() => {
     updateSelectedDataList([]);
-  }, [selectMode, updateSelectedDataList]);
+  }, [currentSelectorId, updateSelectedDataList]);
   // #endregion
 
   return (
@@ -107,24 +111,23 @@ export default function RollCall() {
           {/* 搜索项 */}
           <EcCard title="筛选">
             {/* 选择模式 */}
-            {/* <Select
-            defaultValue="db"
-            value={providerType}
-            onValueChange={setProviderType}
-          >
-            <SelectTrigger className="shrink-0 w-24">
-              <SelectValue placeholder="数据来源" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.keys(dataProviders).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {dataProviders[key].name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select> */}
+            <Select
+              value={currentProviderId}
+              onValueChange={setCurrentProviderId}
+            >
+              <SelectTrigger className="shrink-0 w-24">
+                <SelectValue placeholder="数据来源" />
+              </SelectTrigger>
+              <SelectContent>
+                {dataProviders.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            <dataProvider.component />
+            {currentProvider && <currentProvider.component />}
           </EcCard>
 
           {/* 选择操作 */}
@@ -132,23 +135,22 @@ export default function RollCall() {
             <EcCard title="数据选择">
               {/* 选择模式 */}
               <Select
-                defaultValue="manual"
-                value={selectMode}
-                onValueChange={setSelectMode}
+                value={currentSelectorId}
+                onValueChange={setCurrentSelectorId}
               >
                 <SelectTrigger className="shrink-0 w-24">
                   <SelectValue placeholder="选择模式" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.keys(dataSelectors).map((key) => (
-                    <SelectItem key={key} value={key}>
-                      {dataSelectors[key].name}
+                  {dataSelectors.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
-              <selector.component />
+              {currentSelector && <currentSelector.component />}
             </EcCard>
           )}
 
@@ -158,7 +160,7 @@ export default function RollCall() {
           </EcCard>
         </div>
         {/* 数据列表 */}
-        <DataList onSelect={selector.onSelect} />
+        <DataList onSelect={currentSelector?.onItemClick || (() => {})} />
       </div>
     </div>
   );

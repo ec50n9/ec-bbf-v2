@@ -2,22 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import type { MixedData } from "@/services/types";
+import type { Student, StudentGroup } from "@/services/types";
 import { useStudentStore } from "@/stores/student-store";
-import { useEffect, useMemo, useState } from "react";
-import { create } from "zustand";
-
-type RandomSelectorState = {
-  onSelect: (data: MixedData) => void;
-};
-
-export const useRandomSelectorStore = create<RandomSelectorState>(
-  (set, get) => ({
-    onSelect: (data: MixedData) => {
-      console.log("当前处于随机选择模式，不可以选择");
-    },
-  }),
-);
+import type { EcPlugin } from "@/types/plugin";
+import { useState, useMemo, useEffect } from "react";
 
 export const RandomSelector = () => {
   const allDataList = useStudentStore((s) => s.allDataList);
@@ -31,7 +19,7 @@ export const RandomSelector = () => {
   const [count, setCount] = useState(1);
 
   const [localSelectedList, setLocalSelectedList] = useState(
-    new Set<MixedData>(),
+    new Set<Student | StudentGroup>(),
   );
   const unselectedList = useMemo(
     () => allDataList.filter((item) => !localSelectedList.has(item)),
@@ -44,7 +32,7 @@ export const RandomSelector = () => {
 
   const handleReset = () => {
     updateSelectedDataList([]);
-    setLocalSelectedList(new Set<MixedData>());
+    setLocalSelectedList(new Set<Student | StudentGroup>());
   };
   // 当重复选择开关变化时，重置选择列表
   useEffect(handleReset, [isRepeat]);
@@ -54,7 +42,7 @@ export const RandomSelector = () => {
     if (targetList.length === 0) return;
 
     // 随机选择 count 个数据
-    const selectedDataList = new Set<MixedData>();
+    const selectedDataList = new Set<Student | StudentGroup>();
     for (let i = 0; i < count; i++) {
       const _targetList = targetList.filter(
         (item) => !selectedDataList.has(item),
@@ -111,3 +99,16 @@ export const RandomSelector = () => {
     </>
   );
 };
+
+const plugin: EcPlugin<Student | StudentGroup> = {
+  dataSelector: {
+    id: "selector-random",
+    name: "随机",
+    component: RandomSelector,
+    onItemClick: (data: Student | StudentGroup) => {
+      console.log("当前处于随机选择模式，不可以选择");
+    },
+  },
+};
+
+export default plugin;

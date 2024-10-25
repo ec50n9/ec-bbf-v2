@@ -1,3 +1,4 @@
+import type { OperationConfig } from "@/components/share/ec-data-list";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,11 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import {
   Form,
+  FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
-  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -25,20 +26,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  deleteStudent,
+  type InsertStudentParams,
   getAllStudents,
   insertStudent,
-  type InsertStudentParams,
+  deleteStudent,
 } from "@/services/student";
-import { useStudentStore } from "@/stores/student-store";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { create } from "zustand";
+import { StudentGroup, Student } from "@/services/types";
 import { useGlobalStore } from "@/stores/global-store";
+import { useStudentStore } from "@/stores/student-store";
+import type { EcPlugin } from "@/types/plugin";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { LuTrash } from "react-icons/lu";
-import { Student, StudentGroup } from "@/services/types";
+import { z } from "zod";
+import { create } from "zustand";
 
 type DbProviderState = {
   initData: () => Promise<void>;
@@ -46,7 +48,7 @@ type DbProviderState = {
   delStudent: (id: number) => Promise<void>;
 };
 
-export const useDbProviderStore = create<DbProviderState>((set, get) => ({
+const useDbProviderStore = create<DbProviderState>((set, get) => ({
   initData: async () => {
     const updateAllDataList = useStudentStore.getState().updateAllDataList;
 
@@ -64,7 +66,7 @@ export const useDbProviderStore = create<DbProviderState>((set, get) => ({
   },
 }));
 
-export const dbProviderActions = [
+const actions: OperationConfig<Student | StudentGroup>[] = [
   {
     key: "delete",
     label: "删除",
@@ -81,7 +83,7 @@ export const dbProviderActions = [
   },
 ];
 
-export const DbProvider = () => {
+const ProviderView = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const addStudent = useDbProviderStore((state) => state.addStudent);
@@ -89,8 +91,13 @@ export const DbProvider = () => {
   const handleAddStudent = async (
     student: Pick<InsertStudentParams, "name" | "stuNo">,
   ) => {
-    const clazzId = useGlobalStore.getState().clazz!.id;
-    const subjectId = useGlobalStore.getState().subject!.id;
+    const clazzId = useGlobalStore.getState().clazz?.id;
+    const subjectId = useGlobalStore.getState().subject?.id;
+
+    if (!clazzId || !subjectId) {
+      throw new Error("未选择课程或课程分组");
+    }
+
     await addStudent({ ...student, clazzId, subjectId });
 
     setDialogOpen(false);
@@ -202,3 +209,15 @@ const AddStudentForm = (props: {
     </Form>
   );
 };
+
+const plugin: EcPlugin<Student | StudentGroup> = {
+  dataProvider: {
+    id: "provider-db",
+    name: "数据库",
+    component: ProviderView,
+    onInit: useDbProviderStore.getState().initData,
+  },
+  actions,
+};
+
+export default plugin;
