@@ -1,4 +1,4 @@
-import type { BaseDataType } from "@/components/share/ec-data-list";
+import type { BaseDataType } from "@/types/plugin";
 
 export class Student implements BaseDataType {
   constructor(

@@ -1,4 +1,4 @@
-import type { StudentGroup } from "../share";
+import type { StudentGroup } from "@/services/types";
 
 interface StudentGroupItemProps {
   data: StudentGroup;

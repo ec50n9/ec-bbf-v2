@@ -3,7 +3,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import CommonItem from "../items/common-item";
 import { useStudentStore } from "@/stores/student-store";
 import type { MixedData } from "@/services/types";
-import type { Constructor } from "@/components/share/ec-data-list/share";
+import type { Constructor } from "@/types/plugin";
 import { useEffect } from "react";
 
 export default function DataList(props: {
@@ -58,7 +58,6 @@ export default function DataList(props: {
                 data={item}
                 isDisabled={false}
                 isSelected={isSelected}
-                onClick={() => {}}
               />
             </div>
           );

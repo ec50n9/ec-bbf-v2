@@ -39,8 +39,10 @@ export const updateStudent = async (student: Student) => {
 // 查询学生记录
 export const getStudent = async (id: Student["id"]) => {
   const db = await getDatabase();
-  const res = await db.execute("SELECT * FROM student WHERE id = ?", [id]);
-  return res;
+  const res = await db.select<Student[]>("SELECT * FROM student WHERE id = ?", [
+    id,
+  ]);
+  return res.map((v) => Student.fromJSON(v));
 };
 
 // 获取全部学生记录

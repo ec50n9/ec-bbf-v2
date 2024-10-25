@@ -1,5 +1,5 @@
-import { Clazz } from "@/services/class";
-import { Subject } from "@/services/subject";
+import type { Clazz } from "@/services/class";
+import type { Subject } from "@/services/subject";
 import { create } from "zustand";
 
 type State = {

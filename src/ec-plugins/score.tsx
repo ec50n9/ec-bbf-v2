@@ -1,9 +1,8 @@
 import { Student } from "@/services/types";
 import { LuMinus, LuPlus } from "react-icons/lu";
-import type { EcPlugin } from "@/types/plugin";
-import type { OperationConfig } from "@/components/share/ec-data-list";
+import type { EcPlugin, ActionConfig } from "@/types/plugin";
 
-const actions: OperationConfig<Student>[] = [
+const actions: ActionConfig<Student>[] = [
   {
     key: "addScore",
     label: "加分",
@@ -24,13 +23,13 @@ const actions: OperationConfig<Student>[] = [
   },
 ];
 
-const InfoView = () => {
-  return <div>DataView</div>;
+const InfoView = ({ data }: { data: Student }) => {
+  return <div>这是{data.name}的信息</div>;
 };
 
 const plugin: EcPlugin<Student> = {
   actions,
-  dataView: { component: InfoView },
+  infoViews: [{ supportedTypes: Student, component: InfoView }],
 };
 
 export default plugin;

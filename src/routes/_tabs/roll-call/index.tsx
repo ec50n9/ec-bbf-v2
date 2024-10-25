@@ -3,7 +3,7 @@ import DataOperations from "./components/data-operations";
 import TitleBar from "./components/title-bar";
 import DataList from "./components/data-list";
 import { useStudentStore } from "@/stores/student-store";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -12,70 +12,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import EcCard from "@/components/share/ec-card";
-import type { EcDataProvider, EcDataSelector, EcPlugin } from "@/types/plugin";
-import type { MixedData } from "@/services/types";
-
-const loadPlugins = async () => {
-  const pluginFiles = import.meta.glob("@/ec-plugins/*.tsx");
-  const plugins: EcPlugin<any>[] = [];
-  for (const path in pluginFiles) {
-    const mod = await pluginFiles[path]();
-    plugins.push(mod.default);
-  }
-  return plugins;
-};
+import { usePluginStore } from "@/stores/plugin-store";
 
 export default function RollCall() {
   const isLockMode = useStudentStore((s) => s.isLockMode);
   const updateIsLockMode = useStudentStore((s) => s.updateIsLockMode);
-  const updateOperationConfigs = useStudentStore(
-    (s) => s.updateOperationConfigs,
-  );
   const updateSelectedDataList = useStudentStore(
     (s) => s.updateSelectedDataList,
   );
 
-  const [dataProviders, setDataProviders] = useState<EcDataProvider[]>([]);
-  const [dataSelectors, setDataSelectors] = useState<
-    EcDataSelector<MixedData>[]
-  >([]);
+  const dataProviders = usePluginStore((s) => s.providers);
+  const dataSelectors = usePluginStore((s) => s.selectors);
 
-  const [currentProviderId, setCurrentProviderId] =
-    useState<EcDataProvider["id"]>();
-  const [currentSelectorId, setCurrentSelectorId] =
-    useState<EcDataSelector<MixedData>["id"]>();
+  const currentProviderId = usePluginStore((s) => s.currentProviderId);
+  const setCurrentProviderId = usePluginStore((s) => s.selectProvider);
+  const currentSelectorId = usePluginStore((s) => s.currentSelectorId);
+  const setCurrentSelectorId = usePluginStore((s) => s.selectSelector);
 
-  const currentProvider = useMemo(() => {
-    return dataProviders.find((provider) => provider.id === currentProviderId);
-  }, [currentProviderId, dataProviders]);
-
-  const currentSelector = useMemo(() => {
-    return dataSelectors.find((selector) => selector.id === currentSelectorId);
-  }, [currentSelectorId, dataSelectors]);
-
-  useEffect(() => {
-    loadPlugins().then((plugins) => {
-      console.log("plugins:", plugins);
-
-      // 数据提供器
-      const providers = plugins
-        .filter((plugin) => plugin.dataProvider)
-        .map((plugin) => plugin.dataProvider as EcDataProvider);
-      setDataProviders(providers);
-      setCurrentProviderId(providers[0]?.id);
-
-      // 数据选择器
-      const selectors = plugins
-        .filter((plugin) => plugin.dataSelector)
-        .map((plugin) => plugin.dataSelector as EcDataSelector<MixedData>);
-      setDataSelectors(selectors);
-      setCurrentSelectorId(selectors[0]?.id);
-
-      // 操作
-      const actions = plugins.flatMap((plugin) => plugin.actions || []);
-      updateOperationConfigs([...actions]);
-    });
-  }, []);
+  const currentProvider = usePluginStore((s) => s.currentProvider());
+  const currentSelector = usePluginStore((s) => s.currentSelector());
 
   useEffect(() => {
     // 数据提供器的初始化

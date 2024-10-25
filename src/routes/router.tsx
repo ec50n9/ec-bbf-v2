@@ -10,11 +10,16 @@ import RankingListView from "@/routes/_tabs/ranking-list";
 import SettingsView from "@/routes/_tabs/settings";
 import TestView from "@/routes/test";
 import LoginView from "@/routes/login";
+import Details from "@/routes/details";
 
 export default createBrowserRouter([
   {
     path: "/test",
     element: <TestView />,
+  },
+  {
+    path: "/details/:type/:id",
+    element: <Details />,
   },
   {
     path: "/",
@@ -29,6 +34,7 @@ export default createBrowserRouter([
         path: "roll-call",
         element: <RollCallView />,
       },
+
       {
         path: "score",
         element: <ScoreView />,

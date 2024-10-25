@@ -1,4 +1,4 @@
-import type { OperationConfig } from "@/components/share/ec-data-list";
+import type { ActionConfig } from "@/types/plugin";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -66,7 +66,7 @@ const useDbProviderStore = create<DbProviderState>((set, get) => ({
   },
 }));
 
-const actions: OperationConfig<Student | StudentGroup>[] = [
+const actions: ActionConfig<Student | StudentGroup>[] = [
   {
     key: "delete",
     label: "删除",

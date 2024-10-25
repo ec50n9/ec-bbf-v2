@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -19,7 +19,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { IconType } from "react-icons/lib";
 import { ThemeModeToggle } from "@/components/share/theme-mode-toggle";
-import { getAllClasses, getClass } from "@/services/class";
+import { getAllClasses } from "@/services/class";
 import { getAllSubjects } from "@/services/subject";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useGlobalStore } from "@/stores/global-store";
@@ -38,7 +38,7 @@ export default function Root() {
       return;
     }
 
-    const webview = new WebviewWindow("login", {
+    new WebviewWindow("login", {
       url: "/login",
       title: "初次见面",
       width: 700,
