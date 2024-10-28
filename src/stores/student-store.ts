@@ -9,6 +9,7 @@ type State = {
   selectedDataList: MixedData[];
   isLockMode: boolean;
   lockedOperationKey: ActionConfig<MixedData>["key"] | null;
+  lockedOperationArgs: any;
 };
 
 type Getter = {
@@ -23,6 +24,7 @@ type Action = {
   updateSelectedDataList: (data: State["selectedDataList"]) => void;
   updateIsLockMode: (isLockMode: State["isLockMode"]) => void;
   updateLockedOperationKey: (operation: State["lockedOperationKey"]) => void;
+  updateLockedOperationArgs: (args: State["lockedOperationArgs"]) => void;
 };
 
 export const useStudentStore = create<State & Getter & Action>((set, get) => ({
@@ -45,19 +47,20 @@ export const useStudentStore = create<State & Getter & Action>((set, get) => ({
     const selectedDataTypes = $selectedDataTypes();
 
     return actions.filter((a) =>
-      selectedDataTypes.every((t) => a.supportedTypes.includes(t)),
+      selectedDataTypes.every((t) => a.supportedTypes.includes(t))
     );
   },
   operationConfigs: [],
   isLockMode: false,
   lockedOperationKey: null,
+  lockedOperationArgs: null,
   updateAllDataList: (data) =>
     set((state) => {
       const allDataSet = new Set(data);
       return {
         allDataList: data,
         selectedDataList: state.selectedDataList.filter((i) =>
-          allDataSet.has(i),
+          allDataSet.has(i)
         ),
       };
     }),
@@ -65,4 +68,5 @@ export const useStudentStore = create<State & Getter & Action>((set, get) => ({
   updateIsLockMode: (isLockMode) => set({ isLockMode }),
   updateLockedOperationKey: (operation) =>
     set({ lockedOperationKey: operation }),
+  updateLockedOperationArgs: (args) => set({ lockedOperationArgs: args }),
 }));

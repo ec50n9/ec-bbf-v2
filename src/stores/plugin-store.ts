@@ -53,7 +53,7 @@ export const usePluginStore = create<PluginStore>((set, get) => ({
     const pluginFiles = import.meta.glob("@/ec-plugins/*.tsx");
     const plugins: EcPlugin<any>[] = [];
     for (const path in pluginFiles) {
-      const mod = await pluginFiles[path]();
+      const mod: any = await pluginFiles[path]();
       plugins.push(mod.default);
     }
 

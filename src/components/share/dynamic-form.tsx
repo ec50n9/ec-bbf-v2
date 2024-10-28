@@ -1,4 +1,4 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -49,16 +49,16 @@ type FieldType =
 type FieldValue<T extends FieldType> = T extends "number"
   ? number
   : T extends "switch" | "checkbox"
-    ? boolean
-    : T extends "multiSelect"
-      ? string[]
-      : string;
+  ? boolean
+  : T extends "multiSelect"
+  ? string[]
+  : string;
 
 // 基础字段配置
 interface BaseFieldConfig {
   key: string;
   label: string;
-  required?: boolean;
+  zod: z.ZodTypeAny;
   disabled?: boolean;
   description?: string;
 }
@@ -116,7 +116,7 @@ export type FieldConfig =
   | DateFieldConfig;
 
 // 表单值类型
-type FormValues = {
+export type FormValues = {
   [K in FieldConfig["key"]]: FieldValue<FieldConfig["type"]>;
 };
 
@@ -135,39 +135,53 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 }) => {
   // 动态构建 Zod schema
   const generateSchema = (
-    fields: FieldConfig[],
+    fields: FieldConfig[]
   ): z.ZodObject<Record<string, z.ZodTypeAny>> => {
     const schema: Record<string, z.ZodTypeAny> = {};
 
     for (const field of fields) {
-      let fieldSchema: z.ZodTypeAny;
+      // let fieldSchema: z.ZodTypeAny;
 
-      switch (field.type) {
-        case "text":
-        case "textarea":
-        case "password":
-        case "date":
-        case "select":
-        case "radio":
-          fieldSchema = z.string();
-          break;
-        case "number":
-          fieldSchema = z.number();
-          if (typeof field.min === "number")
-            fieldSchema = fieldSchema.min(field.min);
-          if (typeof field.max === "number")
-            fieldSchema = fieldSchema.max(field.max);
-          break;
-        case "multiSelect":
-          fieldSchema = z.array(z.string());
-          break;
-        case "switch":
-        case "checkbox":
-          fieldSchema = z.boolean();
-          break;
-      }
+      // switch (field.type) {
+      //   case "text":
+      //   case "textarea":
+      //   case "password":
+      //   case "date":
+      //   case "select":
+      //   case "radio":
+      //     fieldSchema = z.string().trim();
+      //     if (field.required) {
+      //       fieldSchema = fieldSchema.min(1, {
+      //         message: `${field.label}不能为空`,
+      //       });
+      //     }
+      //     break;
+      //   case "number":
+      //     fieldSchema = z.number();
+      //     if (typeof field.min === "number")
+      //       fieldSchema = fieldSchema.min(field.min, {
+      //         message: `${field.label}不能小于${field.min}`,
+      //       });
+      //     if (typeof field.max === "number")
+      //       fieldSchema = fieldSchema.max(field.max, {
+      //         message: `${field.label}不能大于${field.max}`,
+      //       });
+      //     break;
+      //   case "multiSelect":
+      //     fieldSchema = z.array(z.string());
+      //     if (field.required) {
+      //       fieldSchema = fieldSchema.min(1, {
+      //         message: `请至少选择一个${field.label}`,
+      //       });
+      //     }
+      //     break;
+      //   case "switch":
+      //   case "checkbox":
+      //     fieldSchema = z.boolean();
+      //     break;
+      // }
 
-      schema[field.key] = field.required ? fieldSchema : fieldSchema.optional();
+      schema[field.key] = field.zod;
     }
 
     return z.object(schema);
@@ -181,17 +195,18 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
           (field.type === "switch" || field.type === "checkbox"
             ? false
             : field.type === "multiSelect"
-              ? []
-              : field.type === "number"
-                ? 0
-                : ""),
+            ? []
+            : field.type === "number"
+            ? 0
+            : ""),
       }),
-    {},
+    {}
   );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(generateSchema(fields)),
     defaultValues: defaultValues as FormValues,
+    mode: "onBlur",
   });
 
   // 监听表单变化
@@ -278,7 +293,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
                           >
                             <Checkbox
                               checked={field.value?.includes(
-                                option.value.toString(),
+                                option.value.toString()
                               )}
                               onCheckedChange={(checked) => {
                                 const currentValues =
@@ -286,7 +301,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
                                 const newValue = checked
                                   ? [...currentValues, option.value.toString()]
                                   : currentValues.filter(
-                                      (v) => v !== option.value.toString(),
+                                      (v) => v !== option.value.toString()
                                     );
                                 field.onChange(newValue);
                               }}

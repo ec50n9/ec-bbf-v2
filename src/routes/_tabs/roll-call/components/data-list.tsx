@@ -18,12 +18,14 @@ export default function DataList(props: {
   const dataList = useStudentStore((s) => s.allDataList);
   const isLockMode = useStudentStore((s) => s.isLockMode);
   const lockedOperation = useStudentStore((s) => s.lockedOperation());
+  const lockedOperationArgs = useStudentStore((s) => s.lockedOperationArgs);
   const supportOperationTypesSet = new Set(lockedOperation?.supportedTypes);
   const selectedDataSet = new Set(useStudentStore((s) => s.selectedDataList));
 
-  const handleOnClick = (data: MixedData) => {
-    if (isLockMode) lockedOperation?.action?.(data);
-    else props.onSelect(data);
+  const handleOnClick = async (data: MixedData) => {
+    if (isLockMode) {
+      lockedOperation?.action?.(data, lockedOperationArgs);
+    } else props.onSelect(data);
   };
 
   return (
@@ -33,8 +35,8 @@ export default function DataList(props: {
           (item) =>
             !isLockMode ||
             supportOperationTypesSet.has(
-              item.constructor as Constructor<MixedData>,
-            ),
+              item.constructor as Constructor<MixedData>
+            )
         )
         .map((item) => {
           const isSelected = !isLockMode && selectedDataSet.has(item);
@@ -51,7 +53,7 @@ export default function DataList(props: {
                 "outline outline-0 outline-offset-2 outline-ring",
                 !isLockMode &&
                   selectedDataSet.has(item) &&
-                  "scale-90 outline-4 z-10",
+                  "scale-90 outline-4 z-10"
               )}
             >
               <CommonItem

@@ -11,21 +11,32 @@ export default function DataOperations() {
   const selectedDataList = useStudentStore((s) => s.selectedDataList);
   const actions = usePluginStore((s) => s.actions);
   const updateLockedOperationKey = useStudentStore(
-    (s) => s.updateLockedOperationKey,
+    (s) => s.updateLockedOperationKey
+  );
+  const updateLockedOperationArgs = useStudentStore(
+    (s) => s.updateLockedOperationArgs
   );
 
   const selectedDataTypes = selectedDataList.map(
-    (i) => i.constructor as Constructor<MixedData>,
+    (i) => i.constructor as Constructor<MixedData>
   );
   const supportedActions = isLockMode
-    ? actions
-    : actions.filter((c) =>
-        selectedDataTypes.every((t) => c.supportedTypes.includes(t)),
+    ? actions.filter((c) => c.supportedTypes)
+    : actions.filter(
+        (c) =>
+          !c.supportedTypes ||
+          selectedDataTypes.every((t) => c.supportedTypes?.includes(t))
       );
-  const handleOnClick = (action: ActionConfig<MixedData>) =>
-    isLockMode
-      ? updateLockedOperationKey(action.key)
-      : selectedDataList.map(action.action);
+  const handleOnClick = async (action: ActionConfig<MixedData>) => {
+    if (isLockMode) {
+      updateLockedOperationKey(action.key);
+      const args = await action.argsResolver?.();
+      updateLockedOperationArgs(args);
+    } else {
+      const args = await action.argsResolver?.();
+      selectedDataList.map((data) => action.action(data, args));
+    }
+  };
 
   return (
     <>
@@ -45,7 +56,7 @@ export default function DataOperations() {
             onClick={() => handleOnClick(action)}
             disabled={!isLockMode && selectedDataList.length === 0}
           >
-            <action.icon className="size-4" />
+            {action.icon && <action.icon className="size-4" />}
             {action.label}
           </Button>
         );

@@ -25,18 +25,20 @@ export type Constructor<T extends BaseDataType> = new (...args: any[]) => T;
 export interface ActionConfig<
   M extends BaseDataType,
   T extends Constructor<M> = Constructor<M>,
+  A = Record<string, any>
 > {
   key: string;
   label: string;
-  icon: IconType;
-  supportedTypes: T[];
-  action: (data: M) => void;
+  icon?: IconType;
+  supportedTypes?: T[];
+  argsResolver?: () => A | Promise<A>;
+  action: (data: M, args?: A) => void;
 }
 
 /** 详情信息视图 */
 export interface InfoView<
   T extends BaseDataType,
-  C extends Constructor<T> = Constructor<T>,
+  C extends Constructor<T> = Constructor<T>
 > {
   supportedTypes: C;
   component: React.FC<{ data: T }>;
