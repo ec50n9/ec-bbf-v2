@@ -2,6 +2,7 @@ import type Database from "@tauri-apps/plugin-sql";
 
 export type ScoreEvent = {
   id: number;
+  name: string;
   topic_id: number;
 };
 

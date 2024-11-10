@@ -72,7 +72,7 @@ function SideBar(props: { className?: string }) {
     top: [{ name: "首页", icon: LuHome, path: "/" }],
     center: [
       { name: "点名", icon: LuLassoSelect, path: "/roll-call" },
-      { name: "积分", icon: LuClipboardList, path: "/score" },
+      { name: "积分", icon: LuClipboardList, path: "/score-management" },
       { name: "计时器", icon: LuTimer, path: "/timer" },
       { name: "倒计时", icon: LuAlarmClock, path: "/countdown" },
       { name: "排行榜", icon: LuAward, path: "/ranking-list" },

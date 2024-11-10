@@ -3,7 +3,7 @@ import ErrorPage from "@/components/share/error-page";
 import Root from "@/routes/root";
 import HomeView from "@/routes/_tabs/home";
 import RollCallView from "@/routes/_tabs/roll-call";
-import ScoreView from "@/routes/_tabs/score";
+import ScoreManagementView from "@/routes/_tabs/score-management";
 import TimerView from "@/routes/_tabs/timer";
 import CountdownView from "@/routes/_tabs/countdown";
 import RankingListView from "@/routes/_tabs/ranking-list";
@@ -36,8 +36,8 @@ export default createBrowserRouter([
       },
 
       {
-        path: "score",
-        element: <ScoreView />,
+        path: "score-management",
+        element: <ScoreManagementView />,
       },
       {
         path: "timer",
