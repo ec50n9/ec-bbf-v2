@@ -62,9 +62,8 @@ export default function RankingList() {
   };
 
   return (
-    <div>
-      <div>hello, world</div>
-      <Button onClick={handleClick}>点击测试</Button>
+    <div className="flex h-full items-center justify-center text-gray-500">
+      开发中...
     </div>
   );
 }

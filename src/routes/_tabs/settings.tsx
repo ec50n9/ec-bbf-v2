@@ -26,12 +26,6 @@ export default function Settings() {
       enabled: true,
     },
     {
-      id: 2,
-      title: "深色模式",
-      description: "切换深色/浅色主题",
-      enabled: false,
-    },
-    {
       id: 3,
       title: "消息通知",
       description: "启用系统通知提醒",
