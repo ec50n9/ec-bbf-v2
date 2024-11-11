@@ -143,3 +143,18 @@ CREATE TABLE IF NOT EXISTS "timer_task" (
   
   PRIMARY KEY("id")
 );
+
+/* 倒计时任务表 */
+CREATE TABLE IF NOT EXISTS "countdown_task" (
+  "id" INTEGER NOT NULL UNIQUE,
+  -- 任务名称
+  "name" VARCHAR NOT NULL,
+  -- 初始时间（秒）
+  "initial_time" INTEGER NOT NULL,
+  -- 剩余时间（秒）
+  "remaining_time" INTEGER NOT NULL,
+  -- 是否显示毫秒
+  "show_milliseconds" BOOLEAN DEFAULT 0,
+  
+  PRIMARY KEY("id")
+);

@@ -5,6 +5,8 @@ import { LuPlay, LuPause, LuRotateCcw, LuPlus, LuTrash2, LuClock, LuStopCircle, 
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { getAllCountdownTasks, insertCountdownTask, updateCountdownTask, deleteCountdownTask, clearAllCountdownTasks } from "@/services/countdown";
+import { throttle } from "radash";
 
 interface CountdownTask {
   id: number;
@@ -15,6 +17,15 @@ interface CountdownTask {
   showMilliseconds: boolean;
   isEditing?: boolean;
 }
+
+// 使用 throttle 限制数据库更新频率
+const throttledUpdateDB = throttle({ interval: 1000 }, async (task: CountdownTask) => {
+  try {
+    await updateCountdownTask(task);
+  } catch (error) {
+    console.error("更新倒计时任务失败:", error);
+  }
+});
 
 export default function Countdown() {
   const [tasks, setTasks] = useState<CountdownTask[]>([]);
@@ -31,28 +42,60 @@ export default function Countdown() {
     return `倒计时（${chineseNumbers[existingDefaultTasks]}）`;
   };
 
-  const addTask = () => {
+  // 初始加载任务
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const savedTasks = await getAllCountdownTasks();
+        setTasks(savedTasks.map(task => ({
+          ...task,
+          isRunning: false,
+          isEditing: false
+        })));
+      } catch (error) {
+        console.error("加载倒计时任务失败:", error);
+      }
+    };
+    loadTasks();
+  }, []);
+
+  const addTask = async () => {
     const minutes = parseInt(newTaskMinutes) || 0;
     const totalSeconds = minutes * 60;
     
     if (totalSeconds <= 0) return;
 
     const taskName = newTaskName.trim() || getDefaultTaskName();
-    const newTask: CountdownTask = {
-      id: Date.now(),
+    const newTask: Omit<CountdownTask, "id"> = {
       name: taskName,
       initialTime: totalSeconds,
       remainingTime: totalSeconds,
-      isRunning: false,
-      showMilliseconds: false
+      showMilliseconds: false,
+      isRunning: false
     };
-    setTasks([...tasks, newTask]);
-    setNewTaskName("");
-    setNewTaskMinutes("");
+
+    try {
+      const result = await insertCountdownTask(newTask);
+      const taskWithId: CountdownTask = {
+        ...newTask,
+        id: result.lastInsertId,
+        isRunning: false
+      };
+      setTasks([...tasks, taskWithId]);
+      setNewTaskName("");
+      setNewTaskMinutes("");
+    } catch (error) {
+      console.error("添加倒计时任务失败:", error);
+    }
   };
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const deleteTask = async (id: number) => {
+    try {
+      await deleteCountdownTask(id);
+      setTasks(tasks.filter(task => task.id !== id));
+    } catch (error) {
+      console.error("删除倒计时任务失败:", error);
+    }
   };
 
   const toggleMilliseconds = (id: number) => {
@@ -67,14 +110,38 @@ export default function Countdown() {
     ));
   };
 
-  const resetTimer = (id: number) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, remainingTime: task.initialTime, isRunning: false } : task
-    ));
+  const resetTimer = async (id: number) => {
+    try {
+      // 找到要重置的任务
+      const taskToReset = tasks.find(task => task.id === id);
+      if (!taskToReset) return;
+
+      // 创建更新后的任务对象
+      const updatedTask = {
+        ...taskToReset,
+        remainingTime: taskToReset.initialTime,
+        isRunning: false
+      };
+
+      // 更新本地状态
+      setTasks(tasks.map(task =>
+        task.id === id ? updatedTask : task
+      ));
+
+      // 更新数据库
+      await updateCountdownTask(updatedTask);
+    } catch (error) {
+      console.error("重置倒计时任务失败:", error);
+    }
   };
 
-  const clearAllTasks = () => {
-    setTasks([]);
+  const clearAllTasks = async () => {
+    try {
+      await clearAllCountdownTasks();
+      setTasks([]);
+    } catch (error) {
+      console.error("清空倒计时任务失败:", error);
+    }
   };
 
   const formatTime = (seconds: number, showMilliseconds: boolean) => {
@@ -99,9 +166,13 @@ export default function Countdown() {
             if (t.id === task.id) {
               const newTime = t.remainingTime - (t.showMilliseconds ? 0.01 : 1);
               if (newTime <= 0) {
-                return { ...t, remainingTime: 0, isRunning: false };
+                const updatedTask = { ...t, remainingTime: 0, isRunning: false };
+                throttledUpdateDB(updatedTask);
+                return updatedTask;
               }
-              return { ...t, remainingTime: newTime };
+              const updatedTask = { ...t, remainingTime: newTime };
+              throttledUpdateDB(updatedTask);
+              return updatedTask;
             }
             return t;
           }));
