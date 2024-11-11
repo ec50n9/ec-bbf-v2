@@ -12,16 +12,16 @@ export class Student implements BaseDataType {
   static fromJSON(data: {
     id: number;
     name: string;
-    stuNo: string;
-    classId: number;
-    subjectId: number;
+    stu_no: string;
+    class_id: number;
+    subject_id: number;
   }) {
     return new Student(
       data.id,
       data.name,
-      data.stuNo,
-      data.classId,
-      data.subjectId,
+      data.stu_no,
+      data.class_id,
+      data.subject_id,
     );
   }
 }
@@ -37,14 +37,14 @@ export class StudentGroup implements BaseDataType {
   static fromJSON(data: {
     id: number;
     name: string;
-    subjectId: number;
-    studentIds: number[];
+    subject_id: number;
+    student_ids: number[];
   }) {
     return new StudentGroup(
       data.id,
       data.name,
-      data.subjectId,
-      data.studentIds,
+      data.subject_id,
+      data.student_ids,
     );
   }
 }
