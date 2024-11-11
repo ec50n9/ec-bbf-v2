@@ -19,7 +19,7 @@ type ScoreStore = {
   updateScore: (score: ScoreStore["score"]) => void;
 };
 
-const useScoreStore = create<ScoreStore>((set, get) => ({
+const useScoreStore = create<ScoreStore>((set) => ({
   topic: null,
   event: null,
   score: null,
