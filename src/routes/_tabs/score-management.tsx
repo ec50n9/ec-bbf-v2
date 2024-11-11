@@ -168,7 +168,7 @@ const ContentTables = () => {
                   <Input
                     value={newTopicName}
                     onChange={(e) => setNewTopicName(e.target.value)}
-                    placeholder="Topic name"
+                    placeholder="主题名称"
                   />
                   <Button
                     onClick={editingTopic ? handleEditTopic : handleAddTopic}
@@ -262,7 +262,7 @@ const ContentTables = () => {
                   <Input
                     value={newEventName}
                     onChange={(e) => setNewEventName(e.target.value)}
-                    placeholder="Event name"
+                    placeholder="事件名称"
                   />
                   <Button
                     onClick={editingEvent ? handleEditEvent : handleAddEvent}
