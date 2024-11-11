@@ -1,17 +1,26 @@
-import type Database from "@tauri-apps/plugin-sql";
+import { getDatabase } from "./database";
 
-export type ScoreTopic = {
-  id: number;
-  name: string;
-  class_id: number;
-  subject_id: number;
-};
+export class ScoreTopic {
+  constructor(
+    public id: number,
+    public name: string,
+    public class_id: number,
+    public subject_id: number,
+  ) {}
+
+  static fromJSON(data: {
+    id: number;
+    name: string;
+    class_id: number;
+    subject_id: number;
+  }) {
+    return new ScoreTopic(data.id, data.name, data.class_id, data.subject_id);
+  }
+}
 
 // 插入积分主题记录
-export const insertScoreTopic = async (
-  db: Database,
-  scoreTopic: Omit<ScoreTopic, "id">,
-) => {
+export const insertScoreTopic = async (scoreTopic: Omit<ScoreTopic, "id">) => {
+  const db = await getDatabase();
   const res = await db.execute(
     "INSERT INTO score_topic (name, class_id, subject_id) VALUES (?, ?, ?)",
     [scoreTopic.name, scoreTopic.class_id, scoreTopic.subject_id],
@@ -20,27 +29,32 @@ export const insertScoreTopic = async (
 };
 
 // 删除积分主题记录
-export const deleteScoreTopic = async (db: Database, id: ScoreTopic["id"]) => {
+export const deleteScoreTopic = async (id: ScoreTopic["id"]) => {
+  const db = await getDatabase();
   const res = await db.execute("DELETE FROM score_topic WHERE id = ?", [id]);
   return res;
 };
 
 // 更新积分主题记录
-export const updateScoreTopic = async (db: Database, scoreTopic: ScoreTopic) => {
+export const updateScoreTopic = async (scoreTopic: ScoreTopic) => {
+  const db = await getDatabase();
   const res = await db.execute(
     "UPDATE score_topic SET name = ?, class_id = ?, subject_id = ? WHERE id = ?",
-    [
-      scoreTopic.name,
-      scoreTopic.class_id,
-      scoreTopic.subject_id,
-      scoreTopic.id,
-    ],
+    [scoreTopic.name, scoreTopic.class_id, scoreTopic.subject_id, scoreTopic.id],
   );
   return res;
 };
 
 // 查询积分主题记录
-export const getScoreTopic = async (db: Database, id: ScoreTopic["id"]) => {
-  const res = await db.execute("SELECT * FROM score_topic WHERE id = ?", [id]);
+export const getScoreTopic = async (id: ScoreTopic["id"]) => {
+  const db = await getDatabase();
+  const res = await db.select<ScoreTopic[]>("SELECT * FROM score_topic WHERE id = ?", [id]);
   return res;
+};
+
+// 获取全部积分主题记录
+export const getAllScoreTopics = async () => {
+  const db = await getDatabase();
+  const res = await db.select<ScoreTopic[]>("SELECT * FROM score_topic");
+  return res.map((v) => ScoreTopic.fromJSON(v));
 };

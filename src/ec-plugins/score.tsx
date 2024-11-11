@@ -4,6 +4,9 @@ import type { EcPlugin, ActionConfig } from "@/types/plugin";
 import { create } from "zustand";
 import { promptForm } from "@/components/share/global-form-dialog";
 import { z } from "zod";
+import { getAllScoreTopics } from "@/services/score-topic";
+import { getAllScoreEvents } from "@/services/score-event";
+import { getDatabase } from "@/services/database";
 
 type ScoreStore = {
   topic: string | null;
@@ -26,9 +29,11 @@ const actions: ActionConfig<Student>[] = [
     icon: LuPlus,
     supportedTypes: [Student],
     argsResolver: async () => {
-      // 判断参数是否存在
-      const { topic, event, updateTopic, updateEvent } =
-        useScoreStore.getState();
+      const { topic, event, updateTopic, updateEvent } = useScoreStore.getState();
+
+      // 获取所有积分主题和事件
+      const topics = await getAllScoreTopics();
+      const events = await getAllScoreEvents();
 
       // 获取参数
       const args = await promptForm<{ topic: string; event: string }>([
@@ -36,7 +41,7 @@ const actions: ActionConfig<Student>[] = [
           key: "topic",
           label: "记分主题",
           type: "select",
-          options: [{ label: "1", value: "1" }],
+          options: topics.map(t => ({ label: t.name, value: t.id.toString() })),
           defaultValue: topic || undefined,
           placeholder: "请选择记分主题",
           zod: z.string().min(1, { message: "请选择记分主题" }),
@@ -45,7 +50,9 @@ const actions: ActionConfig<Student>[] = [
           key: "event",
           label: "事件",
           type: "select",
-          options: [{ label: "1", value: "1" }],
+          options: events
+            .filter(e => topic ? e.topic_id === parseInt(topic) : true)
+            .map(e => ({ label: e.name, value: e.id.toString() })),
           defaultValue: event || undefined,
           placeholder: "请选择记分事件",
           zod: z.string().min(1, { message: "请选择记分事件" }),
@@ -58,8 +65,12 @@ const actions: ActionConfig<Student>[] = [
 
       return args;
     },
-    action: (data, args) => {
-      console.log(`Adding score to ${data.name}`, args);
+    action: async (student, args) => {
+      const db = await getDatabase();
+      await db.execute(
+        "INSERT INTO score_record (student_id, event_id, score, type) VALUES (?, ?, 1, 'add')",
+        [student.id, parseInt(args!.event)]
+      );
     },
   },
   {
@@ -68,9 +79,11 @@ const actions: ActionConfig<Student>[] = [
     icon: LuMinus,
     supportedTypes: [Student],
     argsResolver: async () => {
-      // 判断参数是否存在
-      const { topic, event, updateTopic, updateEvent } =
-        useScoreStore.getState();
+      const { topic, event, updateTopic, updateEvent } = useScoreStore.getState();
+
+      // 获取所有积分主题和事件
+      const topics = await getAllScoreTopics();
+      const events = await getAllScoreEvents();
 
       // 获取参数
       const args = await promptForm<{ topic: string; event: string }>([
@@ -78,7 +91,7 @@ const actions: ActionConfig<Student>[] = [
           key: "topic",
           label: "记分主题",
           type: "select",
-          options: [{ label: "1", value: "1" }],
+          options: topics.map(t => ({ label: t.name, value: t.id.toString() })),
           defaultValue: topic || undefined,
           placeholder: "请选择记分主题",
           zod: z.string().min(1, { message: "请选择记分主题" }),
@@ -87,7 +100,9 @@ const actions: ActionConfig<Student>[] = [
           key: "event",
           label: "事件",
           type: "select",
-          options: [{ label: "1", value: "1" }],
+          options: events
+            .filter(e => topic ? e.topic_id === parseInt(topic) : true)
+            .map(e => ({ label: e.name, value: e.id.toString() })),
           defaultValue: event || undefined,
           placeholder: "请选择记分事件",
           zod: z.string().min(1, { message: "请选择记分事件" }),
@@ -100,8 +115,12 @@ const actions: ActionConfig<Student>[] = [
 
       return args;
     },
-    action: (data) => {
-      console.log(`Subtracting score from ${data.name}`);
+    action: async (student, args) => {
+      const db = await getDatabase();
+      await db.execute(
+        "INSERT INTO score_record (student_id, event_id, score, type) VALUES (?, ?, 1, 'subtract')",
+        [student.id, parseInt(args!.event)]
+      );
     },
   },
 ];

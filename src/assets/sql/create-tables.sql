@@ -101,6 +101,8 @@ CREATE TABLE IF NOT EXISTS "score_topic" (
 
 CREATE TABLE IF NOT EXISTS "score_event" (
 	"id" INTEGER NOT NULL UNIQUE,
+	-- 事件名称
+	"name" VARCHAR,
 	"topic_id" INTEGER,
 
 	PRIMARY KEY("id"),

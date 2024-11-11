@@ -19,19 +19,19 @@ import {
 import { ScoreEvent } from "@/services/score-event";
 import { ScoreTopic } from "@/services/score-topic";
 import { Pencil, Plus, Trash } from "lucide-react";
-import { useState } from "react";
-
-// Mock data
-const initialTopics: ScoreTopic[] = [
-  { id: 1, name: "Math", class_id: 1, subject_id: 1 },
-  { id: 2, name: "English", class_id: 1, subject_id: 1 },
-];
-
-const initialEvents: ScoreEvent[] = [
-  { id: 1, name: "第一次月考", topic_id: 1 },
-  { id: 2, name: "第二次月考", topic_id: 1 },
-  { id: 3, name: "期中考试", topic_id: 2 },
-];
+import { useState, useEffect } from "react";
+import {
+  getAllScoreTopics,
+  insertScoreTopic,
+  updateScoreTopic,
+  deleteScoreTopic,
+} from "@/services/score-topic";
+import {
+  getAllScoreEvents,
+  insertScoreEvent,
+  updateScoreEvent,
+  deleteScoreEvent,
+} from "@/services/score-event";
 
 export default function ScoreManagement() {
   return (
@@ -43,8 +43,8 @@ export default function ScoreManagement() {
 }
 
 const ContentTables = () => {
-  const [topics, setTopics] = useState<ScoreTopic[]>(initialTopics);
-  const [events, setEvents] = useState<ScoreEvent[]>(initialEvents);
+  const [topics, setTopics] = useState<ScoreTopic[]>([]);
+  const [events, setEvents] = useState<ScoreEvent[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<ScoreTopic | null>(null);
   const [isTopicDialogOpen, setIsTopicDialogOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
@@ -53,67 +53,85 @@ const ContentTables = () => {
   const [newTopicName, setNewTopicName] = useState("");
   const [newEventName, setNewEventName] = useState("");
 
+  // 加载数据
+  useEffect(() => {
+    const loadData = async () => {
+      const topicsData = await getAllScoreTopics();
+      const eventsData = await getAllScoreEvents();
+      setTopics(topicsData);
+      setEvents(eventsData);
+    };
+    loadData();
+  }, []);
+
   // Topic CRUD operations
-  const handleAddTopic = () => {
+  const handleAddTopic = async () => {
     if (!newTopicName) return;
-    const newTopic: ScoreTopic = {
-      id: topics.length + 1,
+    const newTopic = {
       name: newTopicName,
       class_id: 1,
       subject_id: 1,
     };
-    setTopics([...topics, newTopic]);
+    await insertScoreTopic(newTopic);
+    const updatedTopics = await getAllScoreTopics();
+    setTopics(updatedTopics);
     setNewTopicName("");
     setIsTopicDialogOpen(false);
   };
 
-  const handleEditTopic = () => {
+  const handleEditTopic = async () => {
     if (!editingTopic || !newTopicName) return;
-    setTopics(
-      topics.map((topic) =>
-        topic.id === editingTopic.id ? { ...topic, name: newTopicName } : topic,
-      ),
-    );
+    await updateScoreTopic({
+      ...editingTopic,
+      name: newTopicName,
+    });
+    const updatedTopics = await getAllScoreTopics();
+    setTopics(updatedTopics);
     setEditingTopic(null);
     setNewTopicName("");
     setIsTopicDialogOpen(false);
   };
 
-  const handleDeleteTopic = (id: number) => {
-    setTopics(topics.filter((topic) => topic.id !== id));
-    setEvents(events.filter((event) => event.topic_id !== id));
+  const handleDeleteTopic = async (id: number) => {
+    await deleteScoreTopic(id);
+    const updatedTopics = await getAllScoreTopics();
+    setTopics(updatedTopics);
     if (selectedTopic?.id === id) {
       setSelectedTopic(null);
     }
   };
 
   // Event CRUD operations
-  const handleAddEvent = () => {
+  const handleAddEvent = async () => {
     if (!selectedTopic) return;
     const newEvent = {
-      id: events.length + 1,
       name: newEventName,
       topic_id: selectedTopic.id,
     };
-    setEvents([...events, newEvent]);
+    await insertScoreEvent(newEvent);
+    const updatedEvents = await getAllScoreEvents();
+    setEvents(updatedEvents);
     setNewEventName("");
     setIsEventDialogOpen(false);
   };
 
-  const handleEditEvent = () => {
+  const handleEditEvent = async () => {
     if (!editingEvent || !newEventName) return;
-    setEvents(
-      events.map((event) =>
-        event.id === editingEvent.id ? { ...event, name: newEventName } : event,
-      ),
-    );
+    await updateScoreEvent({
+      ...editingEvent,
+      name: newEventName,
+    });
+    const updatedEvents = await getAllScoreEvents();
+    setEvents(updatedEvents);
     setEditingEvent(null);
     setNewEventName("");
     setIsEventDialogOpen(false);
   };
 
-  const handleDeleteEvent = (id: number) => {
-    setEvents(events.filter((event) => event.id !== id));
+  const handleDeleteEvent = async (id: number) => {
+    await deleteScoreEvent(id);
+    const updatedEvents = await getAllScoreEvents();
+    setEvents(updatedEvents);
   };
 
   return (
