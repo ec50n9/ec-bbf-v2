@@ -115,6 +115,12 @@ CREATE TABLE IF NOT EXISTS "student_score_mapping" (
 	"student_id" INTEGER,
 	"topic_id" INTEGER,
 	"event_id" INTEGER,
+	-- 分数
+	"score" INTEGER,
+	-- 类型：加分/减分
+	"type" VARCHAR,
+	-- 创建时间
+	"created_at" DATETIME DEFAULT CURRENT_TIMESTAMP,
 
 	PRIMARY KEY("id"),
 	FOREIGN KEY ("student_id") REFERENCES "student"("id")

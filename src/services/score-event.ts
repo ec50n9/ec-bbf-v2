@@ -56,3 +56,17 @@ export const getAllScoreEvents = async () => {
   const res = await db.select<ScoreEvent[]>("SELECT * FROM score_event");
   return res.map(v => ScoreEvent.fromJSON(v));
 };
+
+// 新增：获取学生在特定事件下的总分
+export const getStudentEventScore = async (studentId: number, eventId: number) => {
+  const db = await getDatabase();
+  const res = await db.select<{ total: number }[]>(
+    `SELECT 
+      SUM(CASE WHEN type = 'add' THEN score ELSE -score END) as total 
+    FROM student_score_mapping 
+    WHERE student_id = ? AND event_id = ?
+    GROUP BY event_id`,
+    [studentId, eventId]
+  );
+  return res[0]?.total || 0;
+};
