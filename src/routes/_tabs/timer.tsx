@@ -211,7 +211,7 @@ export default function Timer() {
             <div className="col-span-full flex flex-col items-center justify-center text-muted-foreground py-12">
               <LuClock className="w-12 h-12 mb-4" />
               <p>还没有计时任务</p>
-              <p>点击上方"添加任务"按钮开始使用</p>
+              <p>点击上方"添加"按钮开始使用</p>
             </div>
           ) : (
             tasks.map(task => (
