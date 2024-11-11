@@ -130,3 +130,16 @@ CREATE TABLE IF NOT EXISTS "student_score_mapping" (
 	FOREIGN KEY ("event_id") REFERENCES "score_event"("id")
 	ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+/* 计时器任务表 */
+CREATE TABLE IF NOT EXISTS "timer_task" (
+  "id" INTEGER NOT NULL UNIQUE,
+  -- 任务名称
+  "name" VARCHAR NOT NULL,
+  -- 计时时间（秒）
+  "time" REAL DEFAULT 0,
+  -- 是否显示毫秒
+  "show_milliseconds" BOOLEAN DEFAULT 0,
+  
+  PRIMARY KEY("id")
+);

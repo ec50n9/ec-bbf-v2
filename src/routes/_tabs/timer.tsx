@@ -5,6 +5,8 @@ import { LuPlay, LuPause, LuRotateCcw, LuPlus, LuTrash2, LuClock, LuStopCircle, 
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { getAllTimerTasks, insertTimerTask, updateTimerTask, deleteTimerTask, clearAllTimerTasks } from "@/services/timer";
+import { throttle } from "radash";
 
 interface TimerTask {
   id: number;
@@ -14,6 +16,15 @@ interface TimerTask {
   showMilliseconds: boolean;
   isEditing?: boolean;
 }
+
+// 使用 radash 的 throttle
+const throttledUpdateDB = throttle({ interval: 1000 }, async (task: TimerTask) => {
+  try {
+    await updateTimerTask(task);
+  } catch (error) {
+    console.error("更新计时器任务失败:", error);
+  }
+});
 
 export default function Timer() {
   const [tasks, setTasks] = useState<TimerTask[]>([]);
@@ -30,21 +41,53 @@ export default function Timer() {
     return `计时任务（${chineseNumbers[existingDefaultTasks]}）`;
   };
 
-  const addTask = () => {
+  // 初始加载任务
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const savedTasks = await getAllTimerTasks();
+        setTasks(savedTasks.map(task => ({
+          ...task,
+          isRunning: false,
+          isEditing: false
+        })));
+      } catch (error) {
+        console.error("加载计时器任务失败:", error);
+      }
+    };
+    loadTasks();
+  }, []);
+
+  const addTask = async () => {
     const taskName = newTaskName.trim() || getDefaultTaskName();
-    const newTask: TimerTask = {
-      id: Date.now(),
+    const newTask: Omit<TimerTask, "id"> = {
       name: taskName,
       time: 0,
-      isRunning: false,
-      showMilliseconds: false
+      showMilliseconds: false,
+      isRunning: false
     };
-    setTasks([...tasks, newTask]);
-    setNewTaskName("");
+
+    try {
+      const result = await insertTimerTask(newTask);
+      const taskWithId: TimerTask = {
+        ...newTask,
+        id: result.lastInsertId,
+        isRunning: false
+      };
+      setTasks([...tasks, taskWithId]);
+      setNewTaskName("");
+    } catch (error) {
+      console.error("添加计时器任务失败:", error);
+    }
   };
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const deleteTask = async (id: number) => {
+    try {
+      await deleteTimerTask(id);
+      setTasks(tasks.filter(task => task.id !== id));
+    } catch (error) {
+      console.error("删除计时器任务失败:", error);
+    }
   };
 
   const toggleMilliseconds = (id: number) => {
@@ -65,8 +108,13 @@ export default function Timer() {
     ));
   };
 
-  const clearAllTasks = () => {
-    setTasks([]);
+  const clearAllTasks = async () => {
+    try {
+      await clearAllTimerTasks();
+      setTasks([]);
+    } catch (error) {
+      console.error("清空计���器任务失败:", error);
+    }
   };
 
   const formatTime = (seconds: number, showMilliseconds: boolean) => {
@@ -82,14 +130,22 @@ export default function Timer() {
     }
   };
 
+  // 更新任务时间
   useEffect(() => {
     const intervals: number[] = [];
+
     tasks.forEach(task => {
       if (task.isRunning) {
         const interval = window.setInterval(() => {
-          setTasks(prev => prev.map(t =>
-            t.id === task.id ? { ...t, time: t.time + (t.showMilliseconds ? 0.01 : 1) } : t
-          ));
+          const increment = task.showMilliseconds ? 0.01 : 1;
+          setTasks(prev => prev.map(t => {
+            if (t.id === task.id) {
+              const updatedTask = { ...t, time: t.time + increment };
+              throttledUpdateDB(updatedTask);
+              return updatedTask;
+            }
+            return t;
+          }));
         }, task.showMilliseconds ? 10 : 1000);
         intervals.push(interval);
       }
@@ -103,10 +159,25 @@ export default function Timer() {
     ));
   };
 
-  const updateTaskName = (id: number, newName: string) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, name: newName.trim() || getDefaultTaskName(), isEditing: false } : task
-    ));
+  const updateTaskName = async (id: number, newName: string) => {
+    try {
+      const finalName = newName.trim() || getDefaultTaskName();
+      // 先更新本地状态
+      setTasks(tasks.map(task =>
+        task.id === id ? { ...task, name: finalName, isEditing: false } : task
+      ));
+
+      // 更新数据库
+      const taskToUpdate = tasks.find(task => task.id === id);
+      if (taskToUpdate) {
+        await updateTimerTask({
+          ...taskToUpdate,
+          name: finalName
+        });
+      }
+    } catch (error) {
+      console.error("更新计时器任务名称失败:", error);
+    }
   };
 
   return (
@@ -132,7 +203,7 @@ export default function Timer() {
       </div>
 
       <div className="flex-1 overflow-y-auto mt-4 ml-1 mr-4 pb-3">
-        <div 
+        <div
           ref={listAnimateParent}
           className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         >
@@ -147,7 +218,7 @@ export default function Timer() {
               <Card key={task.id}>
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4">
-                    <div 
+                    <div
                       ref={taskNameParent}
                       className="h-8 font-medium relative group flex items-center"
                     >
@@ -164,9 +235,9 @@ export default function Timer() {
                               }
                             }}
                           />
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
+                          <Button
+                            size="icon"
+                            variant="ghost"
                             className="h-8 w-8"
                             onClick={(e) => {
                               const input = e.currentTarget.previousSibling as HTMLInputElement;
@@ -177,8 +248,8 @@ export default function Timer() {
                           </Button>
                         </div>
                       ) : (
-                        <span 
-                          className="cursor-text hover:cursor-text" 
+                        <span
+                          className="cursor-text hover:cursor-text"
                           onClick={() => startEditing(task.id)}
                         >
                           {task.name}
