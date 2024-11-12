@@ -13,7 +13,7 @@ export default function Home() {
         </h1>
       </div>
 
-      <UserInfoPanel className="w-72 rounded-3xl" />
+      {/* <UserInfoPanel className="w-72 rounded-3xl" /> */}
     </div>
   );
 }

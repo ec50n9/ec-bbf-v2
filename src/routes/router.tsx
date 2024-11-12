@@ -8,15 +8,10 @@ import TimerView from "@/routes/_tabs/timer";
 import CountdownView from "@/routes/_tabs/countdown";
 import RankingListView from "@/routes/_tabs/ranking-list";
 import SettingsView from "@/routes/_tabs/settings";
-import TestView from "@/routes/test";
 import LoginView from "@/routes/login";
 import Details from "@/routes/details";
 
 export default createBrowserRouter([
-  {
-    path: "/test",
-    element: <TestView />,
-  },
   {
     path: "/details/:type/:id",
     element: <Details />,
