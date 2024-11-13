@@ -26,6 +26,8 @@ const throttledUpdateDB = throttle({ interval: 1000 }, async (task: TimerTask) =
   }
 });
 
+const MAX_TIMERS = 9; // 最大允许9个计时器
+
 export default function Timer() {
   const [tasks, setTasks] = useState<TimerTask[]>([]);
   const [newTaskName, setNewTaskName] = useState("");
@@ -59,6 +61,12 @@ export default function Timer() {
   }, []);
 
   const addTask = async () => {
+    if (tasks.length >= MAX_TIMERS) {
+      // 可以添加一个提示UI
+      console.warn("已达到最大计时器数量限制");
+      return;
+    }
+    
     const taskName = newTaskName.trim() || getDefaultTaskName();
     const newTask: Omit<TimerTask, "id"> = {
       name: taskName,
@@ -113,7 +121,7 @@ export default function Timer() {
       await clearAllTimerTasks();
       setTasks([]);
     } catch (error) {
-      console.error("清空计���器任务失败:", error);
+      console.error("清空计时器任务失败:", error);
     }
   };
 
@@ -150,7 +158,17 @@ export default function Timer() {
         intervals.push(interval);
       }
     });
-    return () => intervals.forEach(clearInterval);
+    
+    // 组件卸载时清理所有计时器
+    return () => {
+      intervals.forEach(clearInterval);
+      // 同时将所有运行中的计时器状态保存到数据库
+      tasks.forEach(task => {
+        if (task.isRunning) {
+          updateTimerTask(task).catch(console.error);
+        }
+      });
+    };
   }, [tasks]);
 
   const startEditing = (id: number) => {
