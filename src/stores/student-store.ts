@@ -47,7 +47,7 @@ export const useStudentStore = create<State & Getter & Action>((set, get) => ({
     const selectedDataTypes = $selectedDataTypes();
 
     return actions.filter((a) =>
-      selectedDataTypes.every((t) => a.supportedTypes.includes(t))
+      selectedDataTypes.every((t) => a.supportedTypes?.includes(t))
     );
   },
   operationConfigs: [],

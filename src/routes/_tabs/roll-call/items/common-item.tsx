@@ -4,7 +4,6 @@ import { type MixedData, Student, StudentGroup } from "@/services/types";
 
 export default function CommonItem({
   data,
-  isDisabled,
 }: {
   data: MixedData;
   isDisabled: boolean;

@@ -85,7 +85,7 @@ export function createFormDialog<T extends FormValues>(
       <FormDialog
         title={config.title || "请输入"}
         fields={config.fields}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit as (values: FormValues) => void}
         onCancel={handleCancel}
       />
     );

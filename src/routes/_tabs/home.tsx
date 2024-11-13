@@ -1,4 +1,4 @@
-import { LuBellRing, LuSettings, LuTimer, LuList, LuClipboardList, LuTrophy } from "react-icons/lu";
+import { LuTimer, LuList, LuClipboardList } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 

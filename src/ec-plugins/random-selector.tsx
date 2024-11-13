@@ -105,7 +105,7 @@ const plugin: EcPlugin<Student | StudentGroup> = {
     id: "selector-random",
     name: "随机",
     component: RandomSelector,
-    onItemClick: (data: Student | StudentGroup) => {
+    onItemClick: (_data: Student | StudentGroup) => {
       console.log("当前处于随机选择模式，不可以选择");
     },
   },

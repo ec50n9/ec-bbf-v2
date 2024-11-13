@@ -7,7 +7,7 @@ import { useLoginStore } from "../store";
 import { getClass } from "@/services/class";
 import { getSubject } from "@/services/subject";
 
-export default function EverythingReady(props: StepFormProps) {
+export default function EverythingReady(_props: StepFormProps) {
   const handleOnClick = async () => {
     const clazzId = useLoginStore.getState().clazzId;
     const subjectId = useLoginStore.getState().subjectId;

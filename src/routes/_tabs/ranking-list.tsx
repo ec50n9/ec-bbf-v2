@@ -1,6 +1,5 @@
 import { type FieldConfig } from "@/components/share/dynamic-form";
 import { promptForm } from "@/components/share/global-form-dialog";
-import { Button } from "@/components/ui/button";
 import { z } from "zod";
 
 export default function RankingList() {
@@ -56,6 +55,7 @@ export default function RankingList() {
     },
   ];
 
+  // @ts-ignore
   const handleClick = async () => {
     const userInfo = await promptForm(formFields, "请填写用户信息");
     console.log("用户信息: ", userInfo);

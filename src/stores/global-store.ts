@@ -11,7 +11,7 @@ type Action = {
   updateIsolationCondition: (data: { clazz: Clazz; subject: Subject }) => void;
 };
 
-export const useGlobalStore = create<State & Action>((set, get) => ({
+export const useGlobalStore = create<State & Action>((set, _get) => ({
   clazz: null,
   subject: null,
 

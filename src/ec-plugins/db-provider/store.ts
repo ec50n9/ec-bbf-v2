@@ -9,7 +9,7 @@ type DbProviderState = {
     delStudent: (id: number) => Promise<void>;
 };
 
-export const useDbProviderStore = create<DbProviderState>((set, get) => ({
+export const useDbProviderStore = create<DbProviderState>((_set, get) => ({
     initData: async () => {
         const updateAllDataList = useStudentStore.getState().updateAllDataList;
 
