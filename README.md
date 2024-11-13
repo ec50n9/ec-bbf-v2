@@ -19,6 +19,7 @@
   - 任务数据本地持久化存储
 
 ## 安装
+可从 [Release](https://github.com/ec50n9/ec-bbf-v2/releases) 页面下载最新版本的安装包:
 
 可从 [Release](https://github.com/your-repo/ec-bbf-v2/releases) 页面下载最新版本的安装包。
 
@@ -99,7 +100,7 @@
 2. 克隆项目并安装依赖：
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ec50n9/ec-bbf-v2.git
 cd ec-bbf-v2
 pnpm install
 ```
