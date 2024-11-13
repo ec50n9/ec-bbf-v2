@@ -21,8 +21,6 @@
 ## 安装
 可从 [Release](https://github.com/ec50n9/ec-bbf-v2/releases) 页面下载最新版本的安装包:
 
-可从 [Release](https://github.com/your-repo/ec-bbf-v2/releases) 页面下载最新版本的安装包。
-
 ### Windows
 - `.msi` - Windows 安装程序
 - `.exe` - 便携版程序
