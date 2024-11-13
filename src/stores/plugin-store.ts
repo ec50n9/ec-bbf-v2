@@ -8,7 +8,7 @@ import type {
 } from "@/types/plugin";
 import { create } from "zustand";
 
-type PluginStore = {
+type State = {
   allPlugins: EcPlugin<any>[];
   providers: EcDataProvider[];
   selectors: EcDataSelector<MixedData>[];
@@ -16,14 +16,20 @@ type PluginStore = {
   infoViews: InfoView<MixedData>[];
   currentProviderId: string | undefined;
   currentSelectorId: string | undefined;
+};
+
+type Getter = {
   currentProvider: () => EcDataProvider | null;
   currentSelector: () => EcDataSelector<MixedData> | null;
+};
+
+type Action = {
   initPlugins: () => Promise<void>;
   selectProvider: (id: string) => void;
   selectSelector: (id: string) => void;
 };
 
-export const usePluginStore = create<PluginStore>((set, get) => ({
+export const usePluginStore = create<State & Getter & Action>((set, get) => ({
   allPlugins: [],
   providers: [],
   selectors: [],
@@ -50,7 +56,10 @@ export const usePluginStore = create<PluginStore>((set, get) => ({
   },
 
   initPlugins: async () => {
-    const pluginFiles = import.meta.glob(["@/ec-plugins/*.tsx", "@/ec-plugins/*/index.tsx"]);
+    const pluginFiles = import.meta.glob([
+      "@/ec-plugins/*.tsx",
+      "@/ec-plugins/*/index.tsx",
+    ]);
     const plugins: EcPlugin<any>[] = [];
     for (const path in pluginFiles) {
       const mod: any = await pluginFiles[path]();
