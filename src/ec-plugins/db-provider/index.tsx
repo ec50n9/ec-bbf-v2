@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { LuImport } from "react-icons/lu";
+import { LuImport, LuSearch, LuUserPlus } from "react-icons/lu";
 import { AddStudentForm } from "@/components/students/AddStudentForm";
 import { ImportDialog } from "@/components/students/ImportDialog";
 import { useDbProviderStore } from "./store";
@@ -107,12 +107,14 @@ const ProviderView = () => {
             <Input className="w-40" placeholder="输入关键词搜索" />
 
             <Button size="sm" variant="default">
+                <LuSearch className="mr-2 h-4 w-4" />
                 搜索
             </Button>
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                     <Button size="sm" variant="default">
+                        <LuUserPlus className="mr-2 h-4 w-4" />
                         添加
                     </Button>
                 </DialogTrigger>
